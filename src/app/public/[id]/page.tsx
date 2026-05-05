@@ -284,16 +284,30 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
         <div className="mt-16 pt-12 border-t border-[#E5E7EB]">
           <h2 className="text-2xl font-semibold text-slate-900 mb-6">Telusuri pilihan lainnya di Jawa Tengah</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {allLocations.map((loc) => (
-              <button
-                key={loc}
-                onClick={() => router.push('/public')}
-                className="text-left hover:bg-slate-50 p-4 rounded-xl transition"
-              >
-                <p className="font-semibold text-slate-800">{loc}</p>
-                <p className="text-sm text-slate-400">Sewa tempat liburan</p>
-              </button>
-            ))}
+            {allLocations.map((loc) => {
+              // Get property type for this location
+              const locProperty = properties.find(p => p.location.includes(loc))
+              const typeLabel = locProperty 
+                ? locProperty.type === 'kost' 
+                  ? 'Kost & Boarding House'
+                  : locProperty.type === 'apartment'
+                  ? 'Apartment & Kondominium'
+                  : locProperty.type === 'villa'
+                  ? 'Villa & Resort'
+                  : 'Homestay & Guesthouse'
+                : 'Properti tersedia'
+              
+              return (
+                <button
+                  key={loc}
+                  onClick={() => router.push('/public')}
+                  className="text-left hover:bg-slate-50 p-4 rounded-xl transition"
+                >
+                  <p className="font-semibold text-slate-800">{loc}</p>
+                  <p className="text-sm text-slate-400">{typeLabel}</p>
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>

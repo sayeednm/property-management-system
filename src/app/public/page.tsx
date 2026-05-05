@@ -30,20 +30,46 @@ export default function PublicPage() {
   const [showFavorites, setShowFavorites] = useState(false)
   const [activeTab, setActiveTab] = useState<'home' | 'search' | 'favorites' | 'account'>('home')
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [sortBy, setSortBy] = useState<'default' | 'price-low' | 'price-high' | 'roi-high' | 'roi-low'>('default')
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000000])
+  const [selectedLocation, setSelectedLocation] = useState<string>('all')
 
   const availableProperties = properties.filter((p) => p.status === 'available')
+  
+  // Get unique locations
+  const locations = Array.from(new Set(availableProperties.map(p => {
+    const parts = p.location.split(',')
+    return parts[0].trim()
+  }))).sort()
+
   const filtered = availableProperties.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.location.toLowerCase().includes(search.toLowerCase())
     const matchType = filter === 'all' || p.type === filter
-    return matchSearch && matchType
+    
+    // Filter by price range (Rent mode)
+    const matchPrice = viewMode === 'invest' || (p.price_monthly >= priceRange[0] && p.price_monthly <= priceRange[1])
+    
+    // Filter by location
+    const matchLocation = selectedLocation === 'all' || p.location.includes(selectedLocation)
+    
+    return matchSearch && matchType && matchPrice && matchLocation
+  })
+
+  // Sort properties
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'price-low') return a.price_monthly - b.price_monthly
+    if (sortBy === 'price-high') return b.price_monthly - a.price_monthly
+    if (sortBy === 'roi-high') return calculateROI(b.price_monthly, b.assets_value) - calculateROI(a.price_monthly, a.assets_value)
+    if (sortBy === 'roi-low') return calculateROI(a.price_monthly, a.assets_value) - calculateROI(b.price_monthly, b.assets_value)
+    return 0
   })
 
   // Filter favorites
   const favoriteProperties = showFavorites 
     ? properties.filter((p) => favorites.includes(p.id))
-    : filtered
+    : sorted
 
-  const displayProperties = showFavorites ? favoriteProperties : filtered
+  const displayProperties = showFavorites ? favoriteProperties : sorted
 
   const handleTabChange = (tab: 'home' | 'search' | 'favorites' | 'account') => {
     setActiveTab(tab)
@@ -149,6 +175,14 @@ export default function PublicPage() {
                 <span className="hidden sm:inline">{lang.toUpperCase()}</span>
               </button>
 
+              {/* Admin Link - Desktop Only */}
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-full text-xs font-semibold text-white hover:bg-slate-900 transition"
+              >
+                <span>Admin</span>
+              </button>
+
               {/* Account Button - Desktop Only */}
               <button
                 onClick={() => {
@@ -245,11 +279,124 @@ export default function PublicPage() {
           </div>
         )}
 
+        {/* Advanced Filters - Only show when not in favorites view */}
+        {!showFavorites && (
+          <div className="mb-6 sm:mb-8 bg-white rounded-2xl border border-[#E5E7EB] p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Sort By */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-2">
+                  {lang === 'id' ? 'Urutkan' : 'Sort By'}
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                >
+                  <option value="default">{lang === 'id' ? 'Default' : 'Default'}</option>
+                  {viewMode === 'rent' ? (
+                    <>
+                      <option value="price-low">{lang === 'id' ? 'Harga Termurah' : 'Lowest Price'}</option>
+                      <option value="price-high">{lang === 'id' ? 'Harga Termahal' : 'Highest Price'}</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="roi-high">{lang === 'id' ? '🏆 ROI Tertinggi' : '🏆 Highest ROI'}</option>
+                      <option value="roi-low">{lang === 'id' ? 'ROI Terendah' : 'Lowest ROI'}</option>
+                    </>
+                  )}
+                </select>
+              </div>
+
+              {/* Location Filter */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-2">
+                  {lang === 'id' ? 'Lokasi (Kecamatan)' : 'Location (District)'}
+                </label>
+                <select
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                >
+                  <option value="all">{lang === 'id' ? 'Semua Lokasi' : 'All Locations'}</option>
+                  {locations.map((loc) => (
+                    <option key={loc} value={loc}>{loc}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Price Range - Only for Rent Mode */}
+              {viewMode === 'rent' && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-2">
+                    {lang === 'id' ? 'Rentang Harga/Bulan' : 'Price Range/Month'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                      placeholder="Min"
+                      className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                    />
+                    <span className="text-slate-400">-</span>
+                    <input
+                      type="number"
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                      placeholder="Max"
+                      className="w-full px-3 py-2 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {formatCurrency(priceRange[0])} - {formatCurrency(priceRange[1])}
+                  </p>
+                </div>
+              )}
+
+              {/* ROI Info - Only for Invest Mode */}
+              {viewMode === 'invest' && displayProperties.length > 0 && (
+                <div className="sm:col-span-2 lg:col-span-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-2">
+                    {lang === 'id' ? 'Info ROI' : 'ROI Info'}
+                  </label>
+                  <div className="bg-emerald-50 rounded-xl px-4 py-2.5 border border-emerald-200">
+                    <p className="text-xs text-emerald-700 font-semibold">
+                      {lang === 'id' 
+                        ? `🏆 ROI Tertinggi: ${calculateROI(displayProperties[0].price_monthly, displayProperties[0].assets_value).toFixed(2)}%`
+                        : `🏆 Highest ROI: ${calculateROI(displayProperties[0].price_monthly, displayProperties[0].assets_value).toFixed(2)}%`}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Reset Filters */}
+            <button
+              onClick={() => {
+                setSortBy('default')
+                setPriceRange([0, 20000000])
+                setSelectedLocation('all')
+                setFilter('all')
+                setSearch('')
+              }}
+              className="mt-4 text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+            >
+              {lang === 'id' ? '🔄 Reset Semua Filter' : '🔄 Reset All Filters'}
+            </button>
+          </div>
+        )}
+
         {/* Stats */}
         {!showFavorites && (
           <div className="mb-4 sm:mb-6">
             <p className="text-xs sm:text-sm text-slate-500">
               <span className="font-semibold text-slate-900">{displayProperties.length}</span> {t('propertiesAvailable', lang)}
+              {sortBy !== 'default' && (
+                <span className="ml-2 text-indigo-600">
+                  • {sortBy === 'price-low' ? (lang === 'id' ? 'Termurah' : 'Lowest') : sortBy === 'price-high' ? (lang === 'id' ? 'Termahal' : 'Highest') : sortBy === 'roi-high' ? (lang === 'id' ? 'ROI Tertinggi' : 'Highest ROI') : (lang === 'id' ? 'ROI Terendah' : 'Lowest ROI')}
+                </span>
+              )}
             </p>
           </div>
         )}

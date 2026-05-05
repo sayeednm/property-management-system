@@ -94,6 +94,12 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-[#E5E7EB]">
+          <button
+            onClick={() => window.location.href = '/public'}
+            className="w-full mb-3 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-sm font-semibold hover:bg-indigo-100 transition"
+          >
+            ← Kembali ke Website
+          </button>
           <p className="text-xs text-slate-400">© 2025 PropManager</p>
         </div>
       </aside>

@@ -73,10 +73,15 @@ export default function PropertyModal({ property, onClose }: Props) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="relative w-full h-44 bg-gradient-to-br from-indigo-50 to-slate-100 rounded-t-2xl flex items-center justify-center">
-          <TypeIcon className="w-16 h-16 text-indigo-200" />
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:bg-slate-50 transition">
-            <X className="w-4 h-4 text-slate-500" />
+        <div className="relative w-full h-44 rounded-t-2xl overflow-hidden">
+          <img 
+            src={property.images[0]} 
+            alt={property.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-white transition">
+            <X className="w-4 h-4 text-slate-700" />
           </button>
         </div>
 
@@ -195,12 +200,23 @@ export default function PropertyModal({ property, onClose }: Props) {
                 <label className="text-xs font-medium text-slate-500 mb-1 flex items-center gap-1">
                   <Calendar className="w-3 h-3" /> Tanggal Check-in
                 </label>
-                <input
-                  type="date"
-                  value={form.checkIn}
-                  onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={form.checkIn}
+                    onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
+                  />
+                  {form.checkIn && (
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, checkIn: '' })}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
                 {errors.checkIn && <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>}
               </div>
 

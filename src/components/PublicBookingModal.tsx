@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, MapPin, Home, Building2, TreePine, House, Calendar, User, Mail, Clock, CheckCircle, Phone } from 'lucide-react'
+import { X, MapPin, Home, Building2, TreePine, House, Calendar, User, Mail, Clock, CheckCircle, Phone, MessageCircle } from 'lucide-react'
 import { Property } from '@/lib/supabase'
 import { formatCurrency, calculateROI, cn } from '@/lib/utils'
 import { usePropertyStore } from '@/store/usePropertyStore'
@@ -82,6 +82,43 @@ export default function PublicBookingModal({ property, mode = 'rent', onClose }:
     setSuccess(true)
   }
 
+  const handleWhatsAppBooking = () => {
+    const errs = validate()
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+
+    // Format WhatsApp message
+    let message = `Halo, saya tertarik dengan properti:\n\n`
+    message += `📍 *${property.name}*\n`
+    message += `📌 ${property.location}\n`
+    message += `🏠 Tipe: ${type.label}\n\n`
+    
+    if (mode === 'invest') {
+      message += `💰 *Penawaran Investasi*\n`
+      message += `Nilai Aset: ${formatCurrency(property.assets_value)}\n`
+      message += `ROI: ${roi.toFixed(2)}%/tahun\n`
+      message += `Pendapatan: ${formatCurrency(property.price_monthly)}/bulan\n\n`
+    } else {
+      message += `📅 Check-in: ${form.checkIn}\n`
+      message += `⏱️ Durasi: ${form.duration} bulan\n`
+      message += `💵 Harga: ${formatCurrency(property.price_monthly)}/bulan\n\n`
+    }
+    
+    message += `👤 Nama: ${form.customerName}\n`
+    message += `📧 Email: ${form.customerEmail}\n`
+    if (form.customerPhone) message += `📱 Telepon: ${form.customerPhone}\n`
+    
+    message += `\nMohon informasi lebih lanjut. Terima kasih!`
+
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message)
+    
+    // Replace with your WhatsApp business number (format: 62xxx without +)
+    const waNumber = '6281234567890' // Ganti dengan nomor WA bisnis kamu
+    
+    // Open WhatsApp
+    window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank')
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
@@ -89,13 +126,18 @@ export default function PublicBookingModal({ property, mode = 'rent', onClose }:
     >
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header image */}
-        <div className="relative w-full h-44 bg-gradient-to-br from-indigo-50 to-slate-100 rounded-t-2xl flex items-center justify-center">
-          <TypeIcon className="w-16 h-16 text-indigo-200" />
+        <div className="relative w-full h-44 rounded-t-2xl overflow-hidden">
+          <img 
+            src={property.images[0]} 
+            alt={property.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:bg-slate-50 transition"
+            className="absolute top-4 right-4 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-white transition"
           >
-            <X className="w-4 h-4 text-slate-500" />
+            <X className="w-4 h-4 text-slate-700" />
           </button>
         </div>
 
@@ -222,12 +264,23 @@ export default function PublicBookingModal({ property, mode = 'rent', onClose }:
                     <label className="text-xs font-medium text-slate-500 mb-1 flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Tanggal Check-in
                     </label>
-                    <input
-                      type="date"
-                      value={form.checkIn}
-                      onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
-                    />
+                    <div className="relative">
+                      <input
+                        type="date"
+                        value={form.checkIn}
+                        onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
+                        className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
+                      />
+                      {form.checkIn && (
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, checkIn: '' })}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                     {errors.checkIn && <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>}
                   </div>
 
@@ -254,6 +307,20 @@ export default function PublicBookingModal({ property, mode = 'rent', onClose }:
               >
                 {mode === 'invest' ? 'Kirim Penawaran Investasi' : 'Kirim Booking Request'}
               </button>
+
+              {/* WhatsApp Button */}
+              <button
+                type="button"
+                onClick={handleWhatsAppBooking}
+                className="w-full py-2.5 bg-emerald-500 text-white text-sm font-semibold rounded-xl hover:bg-emerald-600 transition flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                {mode === 'invest' ? 'Hubungi via WhatsApp' : 'Booking via WhatsApp'}
+              </button>
+
+              <p className="text-xs text-center text-slate-400">
+                Pilih booking via WhatsApp untuk respon lebih cepat
+              </p>
             </form>
           )}
         </div>

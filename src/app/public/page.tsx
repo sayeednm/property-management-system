@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp, Globe, Heart, User } from 'lucide-react'
+import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp, Globe, Heart, User, LayoutDashboard } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
 import { useUserStore } from '@/store/useUserStore'
 import { Property, PropertyType } from '@/lib/supabase'
@@ -494,7 +494,7 @@ export default function PublicPage() {
 
       {/* Bottom Navigation - Mobile Only */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] shadow-lg sm:hidden z-50">
-        <div className="grid grid-cols-3 h-16">
+        <div className="grid grid-cols-4 h-16">
           {/* Search/Home */}
           <button
             onClick={() => handleTabChange('home')}
@@ -522,6 +522,15 @@ export default function PublicPage() {
                 {favorites.length}
               </span>
             )}
+          </button>
+
+          {/* Admin */}
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="flex flex-col items-center justify-center gap-1 text-slate-800 transition-colors hover:text-indigo-600"
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Admin</span>
           </button>
 
           {/* Account */}

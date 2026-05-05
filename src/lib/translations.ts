@@ -12,7 +12,7 @@ export const translations = {
     heroTitleRent: 'Temukan Hunian Impian di Yogyakarta',
     heroTitleInvest: 'Investasi Properti Menguntungkan',
     heroSubtitleRent: 'Properti berkualitas di Yogyakarta. Kost, Apartment, Villa, dan Homestay dengan harga terjangkau.',
-    heroSubtitleInvest: 'Analisis ROI transparan untuk setiap properti. Temukan investasi terbaik dengan return optimal.',
+    heroSubtitleInvest: 'Bukan sekadar bangunan, ini adalah mesin uang.',
     searchPlaceholder: 'Cari lokasi atau nama properti...',
     searchButton: 'Cari',
     
@@ -80,7 +80,7 @@ export const translations = {
     heroTitleRent: 'Find Your Dream Home in Yogyakarta',
     heroTitleInvest: 'Profitable Property Investment',
     heroSubtitleRent: 'Quality properties in Yogyakarta. Kost, Apartments, Villas, and Homestays at affordable prices.',
-    heroSubtitleInvest: 'Transparent ROI analysis for every property. Find the best investment with optimal returns.',
+    heroSubtitleInvest: 'Not just a building, it\'s a money machine.',
     searchPlaceholder: 'Search location or property name...',
     searchButton: 'Search',
     

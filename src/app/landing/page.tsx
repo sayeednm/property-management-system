@@ -226,14 +226,14 @@ export default function LandingPage() {
       {/* Property Grid Section */}
       <section className={darkMode ? 'py-16 bg-[#0a1a20]' : 'py-16 bg-white'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-2">
             <div>
               <p className={darkMode ? 'text-sm text-[#E6A854] mb-2' : 'text-sm text-slate-500 mb-2'}>PILIHAN UNGGULAN</p>
               <h2 className={darkMode ? 'text-3xl font-bold text-white' : 'text-3xl font-bold text-slate-900'}>Properti aktif kami</h2>
             </div>
             <button
               onClick={() => router.push('/public')}
-              className={darkMode ? 'text-sm font-semibold text-[#E6A854] hover:text-[#D4AF37] flex items-center gap-2' : 'text-sm font-semibold text-[#D4AF37] hover:text-[#E6A854] flex items-center gap-2'}
+              className={darkMode ? 'text-sm font-semibold text-[#E6A854] hover:text-[#D4AF37] flex items-center gap-2 flex-shrink-0' : 'text-sm font-semibold text-[#D4AF37] hover:text-[#E6A854] flex items-center gap-2 flex-shrink-0'}
             >
               Lihat semua
               <ArrowRight className="w-4 h-4" />

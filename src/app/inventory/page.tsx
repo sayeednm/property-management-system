@@ -206,13 +206,6 @@ export default function InventoryPage() {
   )
 }
 
-const typeConfig = {
-  kost: { label: 'Kost', icon: Home, color: 'bg-blue-50 text-blue-600' },
-  apartment: { label: 'Apartment', icon: Building2, color: 'bg-purple-50 text-purple-600' },
-  villa: { label: 'Villa', icon: TreePine, color: 'bg-green-50 text-green-600' },
-  homestay: { label: 'Homestay', icon: House, color: 'bg-orange-50 text-orange-600' },
-}
-
 const statusConfig = {
   available: { label: 'Available', color: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
   occupied: { label: 'Occupied', color: 'bg-slate-100 text-slate-500 border-slate-200' },

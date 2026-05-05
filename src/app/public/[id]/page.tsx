@@ -112,9 +112,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
         <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-6 overflow-x-auto">
           <button onClick={() => router.push('/public')} className="hover:text-slate-900 whitespace-nowrap">PropStay</button>
           <span>›</span>
-          <span className="whitespace-nowrap">Jawa Tengah</span>
-          <span>›</span>
-          <span className="whitespace-nowrap">Semarang</span>
+          <span className="whitespace-nowrap">Yogyakarta</span>
           <span className="hidden sm:inline">›</span>
           <span className="text-slate-900 truncate hidden sm:inline">{property.name}</span>
         </div>
@@ -137,11 +135,21 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
         {/* Photo Gallery */}
         <div className="relative grid grid-cols-4 gap-2 rounded-2xl overflow-hidden mb-6 sm:mb-8 h-64 sm:h-80 md:h-96">
-          <div className={cn('col-span-2 row-span-2 bg-gradient-to-br', typeConfig[property.type].gradient)} />
-          <div className={cn('bg-gradient-to-br opacity-80', typeConfig[property.type].gradient)} />
-          <div className={cn('bg-gradient-to-br opacity-70', typeConfig[property.type].gradient)} />
-          <div className={cn('bg-gradient-to-br opacity-60', typeConfig[property.type].gradient)} />
-          <div className={cn('bg-gradient-to-br opacity-50', typeConfig[property.type].gradient)} />
+          <div className="col-span-2 row-span-2 relative">
+            <img src={property.images[0]} alt={property.name} className="w-full h-full object-cover" />
+          </div>
+          <div className="relative">
+            <img src={property.images[0]} alt={property.name} className="w-full h-full object-cover" />
+          </div>
+          <div className="relative">
+            <img src={property.images[0]} alt={property.name} className="w-full h-full object-cover" />
+          </div>
+          <div className="relative">
+            <img src={property.images[0]} alt={property.name} className="w-full h-full object-cover" />
+          </div>
+          <div className="relative">
+            <img src={property.images[0]} alt={property.name} className="w-full h-full object-cover" />
+          </div>
           
           {/* Show all photos button */}
           <button
@@ -487,7 +495,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
         {/* Explore More */}
         <div className="mt-16 pt-12 border-t border-[#E5E7EB]">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-6">Telusuri pilihan lainnya di Jawa Tengah</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 mb-6">Telusuri pilihan lainnya di Yogyakarta</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {allLocations.map((loc) => {
               // Get property type for this location

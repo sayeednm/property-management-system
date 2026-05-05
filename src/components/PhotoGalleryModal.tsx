@@ -109,9 +109,14 @@ export default function PhotoGalleryModal({ property, onClose }: Props) {
                   onClick={() => setSelectedPhoto(index)}
                   className="relative aspect-[4/3] rounded-xl overflow-hidden group"
                 >
-                  <div className={cn('absolute inset-0 bg-gradient-to-br', gradient, 'opacity-80 group-hover:opacity-90 transition')} />
+                  <img 
+                    src={property.images[0]} 
+                    alt={photo.label}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition" />
                   <div className="absolute inset-0 flex items-center justify-center p-2">
-                    <span className="text-white font-semibold text-xs sm:text-sm md:text-lg text-center">{photo.label}</span>
+                    <span className="text-white font-semibold text-xs sm:text-sm md:text-lg text-center drop-shadow-lg">{photo.label}</span>
                   </div>
                 </button>
               ))}
@@ -262,9 +267,14 @@ export default function PhotoGalleryModal({ property, onClose }: Props) {
           </button>
 
           <div className="max-w-5xl w-full aspect-[4/3] relative rounded-xl overflow-hidden">
-            <div className={cn('absolute inset-0 bg-gradient-to-br', gradient)} />
+            <img 
+              src={property.images[0]} 
+              alt={photos[selectedPhoto].label}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-white font-semibold text-2xl">{photos[selectedPhoto].label}</span>
+              <span className="text-white font-semibold text-2xl drop-shadow-lg">{photos[selectedPhoto].label}</span>
             </div>
           </div>
 

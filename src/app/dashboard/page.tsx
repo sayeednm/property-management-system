@@ -49,15 +49,15 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 bg-[#F9FAFB] min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-800">Property Dashboard</h1>
-          <p className="text-slate-400 text-sm mt-1">Manage and monitor all your properties</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Property Dashboard</h1>
+          <p className="text-slate-400 text-xs sm:text-sm mt-1">Manage and monitor all your properties</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <StatCard icon={Home} label="Total Properties" value={stats.total} color="text-indigo-600 bg-indigo-50" />
           <StatCard icon={CheckCircle} label="Available" value={stats.available} color="text-emerald-600 bg-emerald-50" />
           <StatCard icon={TrendingUp} label="Occupied" value={stats.occupied} color="text-slate-600 bg-slate-100" />
@@ -76,15 +76,15 @@ export default function DashboardPage() {
               className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#E5E7EB] rounded-xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+            <SlidersHorizontal className="w-4 h-4 text-slate-400 flex-shrink-0" />
             <div className="flex gap-1.5">
               {filterOptions.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setFilterType(opt.value)}
                   className={cn(
-                    'px-3 py-2 rounded-lg text-xs font-medium transition-all',
+                    'px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap',
                     filterType === opt.value
                       ? 'bg-indigo-600 text-white'
                       : 'bg-white border border-[#E5E7EB] text-slate-500 hover:border-indigo-300 hover:text-indigo-600'
@@ -99,12 +99,12 @@ export default function DashboardPage() {
 
         {/* Grid */}
         {filtered.length === 0 ? (
-          <div className="text-center py-20 text-slate-400">
+          <div className="text-center py-16 sm:py-20 text-slate-400">
             <Home className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p className="text-sm">No properties found</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {filtered.map((property) => (
               <PropertyCard
                 key={property.id}
@@ -139,13 +139,13 @@ function StatCard({
   color: string
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-[#E5E7EB] p-4 flex items-center gap-3">
-      <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center', color.split(' ')[1])}>
-        <Icon className={cn('w-5 h-5', color.split(' ')[0])} />
+    <div className="bg-white rounded-2xl border border-[#E5E7EB] p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+      <div className={cn('w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center', color.split(' ')[1])}>
+        <Icon className={cn('w-4 h-4 sm:w-5 sm:h-5', color.split(' ')[0])} />
       </div>
       <div>
-        <p className="text-2xl font-bold text-slate-800">{value}</p>
-        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-xl sm:text-2xl font-bold text-slate-800">{value}</p>
+        <p className="text-[10px] sm:text-xs text-slate-400">{label}</p>
       </div>
     </div>
   )

@@ -30,9 +30,13 @@ export default function PropertyCard({ property, onClick }: PropertyCardProps) {
 
   return (
     <div onClick={onClick} className="bg-white rounded-2xl border border-[#E5E7EB] p-5 hover:shadow-md hover:border-indigo-200 transition-all duration-200 cursor-pointer group">
-      {/* Image placeholder */}
-      <div className="w-full h-40 bg-gradient-to-br from-indigo-50 to-slate-100 rounded-xl mb-4 flex items-center justify-center">
-        <TypeIcon className="w-10 h-10 text-indigo-300" />
+      {/* Image */}
+      <div className="relative w-full h-40 rounded-xl mb-4 overflow-hidden">
+        <img 
+          src={property.images[0]} 
+          alt={property.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
       </div>
 
       {/* Header */}

@@ -413,11 +413,12 @@ function PropertyCard({ property, viewMode, lang, onClick }: { property: Propert
     <div onClick={handleCardClick} className="group cursor-pointer transform transition-all duration-300 active:scale-95">
       {/* Image - Optimized for Mobile */}
       <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-3 shadow-md group-hover:shadow-xl transition-all duration-300">
-        <div className={cn('absolute inset-0 bg-gradient-to-br', type.gradient)} />
+        <img 
+          src={property.images[0]} 
+          alt={property.name}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <TypeIcon className="w-16 h-16 sm:w-20 sm:h-20 text-white/70 group-hover:scale-110 group-hover:text-white/90 transition-all duration-500" />
-        </div>
         
         {/* Favorite Button */}
         <button 

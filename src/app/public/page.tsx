@@ -17,25 +17,6 @@ const typeConfig = {
 
 type ViewMode = 'rent' | 'invest'
 
-// Helper function to group properties by area
-function getLocationGroups(properties: Property[]) {
-  const groups: { [key: string]: Property[] } = {}
-  
-  properties.forEach((prop) => {
-    // Extract area from location (e.g., "Simpang Lima, Semarang" -> "Semarang")
-    const area = prop.location.split(',').pop()?.trim() || 'Semarang'
-    if (!groups[area]) {
-      groups[area] = []
-    }
-    groups[area].push(prop)
-  })
-  
-  return Object.entries(groups).map(([area, properties]) => ({
-    area,
-    properties,
-  }))
-}
-
 export default function PublicPage() {
   const { properties } = usePropertyStore()
   const router = useRouter()
@@ -143,69 +124,50 @@ export default function PublicPage() {
       </div>
 
       {/* Filter & Content */}
-      <div className="py-6 sm:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {/* Filter tabs - Horizontal Scroll on Mobile */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6 sm:mb-8">
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0 sm:flex-wrap pb-2 sm:pb-0">
-              {filterOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => setFilter(opt.value)}
-                  className={cn(
-                    'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all border whitespace-nowrap',
-                    filter === opt.value
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                      : 'bg-white border-[#E5E7EB] text-slate-600'
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 mb-6 sm:mb-8">
+          <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0 sm:flex-wrap pb-2 sm:pb-0">
+            {filterOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setFilter(opt.value)}
+                className={cn(
+                  'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all border whitespace-nowrap',
+                  filter === opt.value
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                    : 'bg-white border-[#E5E7EB] text-slate-600'
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Properties by Location - Horizontal Scroll */}
+        {/* Stats */}
+        <div className="mb-4 sm:mb-6">
+          <p className="text-xs sm:text-sm text-slate-500">
+            <span className="font-semibold text-slate-900">{filtered.length}</span> {t('propertiesAvailable', lang)}
+          </p>
+        </div>
+
+        {/* Grid - Responsive */}
         {filtered.length === 0 ? (
           <div className="text-center py-16 sm:py-20 text-slate-400">
             <Home className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-30" />
             <p className="text-sm">No properties found.</p>
           </div>
         ) : (
-          <div className="space-y-8 sm:space-y-12">
-            {/* Group properties by location area */}
-            {getLocationGroups(filtered).map((group) => (
-              <div key={group.area}>
-                {/* Section Header */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-4 flex items-center justify-between">
-                  <h2 className="text-lg sm:text-2xl font-bold text-slate-900">
-                    {lang === 'id' ? `Penginapan populer di ${group.area}` : `Popular stays in ${group.area}`}
-                  </h2>
-                  <button className="text-sm font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1">
-                    {lang === 'id' ? 'Lihat semua' : 'See all'}
-                    <span>→</span>
-                  </button>
-                </div>
-
-                {/* Horizontal Scroll Cards */}
-                <div className="overflow-x-auto scrollbar-hide">
-                  <div className="flex gap-4 px-4 sm:px-6 pb-2">
-                    <div className="flex gap-4 sm:gap-5">
-                      {group.properties.map((property) => (
-                        <div key={property.id} className="flex-shrink-0 w-[280px] sm:w-[320px]">
-                          <PropertyCard
-                            property={property}
-                            viewMode={viewMode}
-                            lang={lang}
-                            onClick={() => router.push(`/public/${property.id}?lang=${lang}`)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            {filtered.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                viewMode={viewMode}
+                lang={lang}
+                onClick={() => router.push(`/public/${property.id}?lang=${lang}`)}
+              />
             ))}
           </div>
         )}

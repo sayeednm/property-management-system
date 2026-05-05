@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp, Globe, Heart, User, LayoutDashboard, Sun, Moon } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
 import { useUserStore } from '@/store/useUserStore'
+import { useThemeStore } from '@/store/useThemeStore'
 import { Property, PropertyType } from '@/lib/supabase'
 import { formatCurrency, calculateROI, cn } from '@/lib/utils'
 import { t, Language } from '@/lib/translations'
@@ -22,6 +23,7 @@ type ViewMode = 'rent' | 'invest'
 export default function PublicPage() {
   const { properties, favorites } = usePropertyStore()
   const { isAuthenticated, currentUser } = useUserStore()
+  const { darkMode, toggleDarkMode } = useThemeStore()
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<PropertyType | 'all'>('all')
@@ -33,7 +35,6 @@ export default function PublicPage() {
   const [sortBy, setSortBy] = useState<'default' | 'price-low' | 'price-high' | 'roi-high' | 'roi-low'>('default')
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000000])
   const [selectedLocation, setSelectedLocation] = useState<string>('all')
-  const [darkMode, setDarkMode] = useState(false)
 
   const availableProperties = properties.filter((p) => p.status === 'available')
   
@@ -184,7 +185,7 @@ export default function PublicPage() {
             <div className="flex items-center gap-2">
               {/* Dark Mode Toggle */}
               <button
-                onClick={() => setDarkMode(!darkMode)}
+                onClick={toggleDarkMode}
                 className={darkMode ? 'p-1.5 sm:p-2 bg-[#E6A854]/10 text-[#E6A854] rounded-lg hover:bg-[#E6A854]/20 transition' : 'p-1.5 sm:p-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition'}
               >
                 {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -469,6 +470,7 @@ export default function PublicPage() {
                 property={property}
                 viewMode={viewMode}
                 lang={lang}
+                darkMode={darkMode}
                 onClick={() => {}} // Not used anymore, handled inside PropertyCard
               />
             ))}
@@ -522,14 +524,16 @@ export default function PublicPage() {
       </footer>
 
       {/* Bottom Navigation - Mobile Only */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] shadow-lg sm:hidden z-50">
+      <nav className={darkMode ? 'fixed bottom-0 left-0 right-0 bg-[#001117] border-t border-[#E6A854]/20 shadow-lg sm:hidden z-50' : 'fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] shadow-lg sm:hidden z-50'}>
         <div className="grid grid-cols-4 h-16">
           {/* Search/Home */}
           <button
             onClick={() => handleTabChange('home')}
             className={cn(
               'flex flex-col items-center justify-center gap-1 transition-colors',
-              activeTab === 'home' ? 'text-red-600' : 'text-slate-400'
+              activeTab === 'home'
+                ? darkMode ? 'text-[#E6A854]' : 'text-slate-900'
+                : 'text-slate-400'
             )}
           >
             <Search className="w-5 h-5" />
@@ -541,13 +545,15 @@ export default function PublicPage() {
             onClick={() => handleTabChange('favorites')}
             className={cn(
               'relative flex flex-col items-center justify-center gap-1 transition-colors',
-              activeTab === 'favorites' ? 'text-red-600' : 'text-slate-400'
+              activeTab === 'favorites'
+                ? darkMode ? 'text-[#E6A854]' : 'text-red-600'
+                : 'text-slate-400'
             )}
           >
-            <Heart className={cn('w-5 h-5', activeTab === 'favorites' && 'fill-red-600')} />
+            <Heart className={cn('w-5 h-5', activeTab === 'favorites' && (darkMode ? 'fill-[#E6A854]' : 'fill-red-600'))} />
             <span className="text-[10px] font-medium">{lang === 'id' ? 'Favorit' : 'Favorites'}</span>
             {favorites.length > 0 && (
-              <span className="absolute top-1 right-6 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+              <span className={darkMode ? 'absolute top-1 right-6 w-4 h-4 bg-[#E6A854] text-[#001117] text-[9px] font-bold rounded-full flex items-center justify-center' : 'absolute top-1 right-6 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center'}>
                 {favorites.length}
               </span>
             )}
@@ -556,7 +562,7 @@ export default function PublicPage() {
           {/* Admin */}
           <button
             onClick={() => router.push('/dashboard')}
-            className={darkMode ? 'flex flex-col items-center justify-center gap-1 text-[#E6A854] transition-colors hover:text-[#D4AF37]' : 'flex flex-col items-center justify-center gap-1 text-slate-800 transition-colors hover:text-[#D4AF37]'}
+            className={darkMode ? 'flex flex-col items-center justify-center gap-1 text-[#E6A854] transition-colors' : 'flex flex-col items-center justify-center gap-1 text-slate-600 transition-colors hover:text-slate-900'}
           >
             <LayoutDashboard className="w-5 h-5" />
             <span className="text-[10px] font-medium">Admin</span>
@@ -567,13 +573,15 @@ export default function PublicPage() {
             onClick={() => handleTabChange('account')}
             className={cn(
               'flex flex-col items-center justify-center gap-1 transition-colors',
-              activeTab === 'account' ? 'text-red-600' : 'text-slate-400'
+              activeTab === 'account'
+                ? darkMode ? 'text-[#E6A854]' : 'text-slate-900'
+                : 'text-slate-400'
             )}
           >
             <User className="w-5 h-5" />
             <span className="text-[10px] font-medium">
-              {isAuthenticated 
-                ? currentUser?.name.split(' ')[0] 
+              {isAuthenticated
+                ? currentUser?.name.split(' ')[0]
                 : lang === 'id' ? 'Masuk' : 'Login'}
             </span>
           </button>
@@ -588,7 +596,7 @@ export default function PublicPage() {
   )
 }
 
-function PropertyCard({ property, viewMode, lang, onClick }: { property: Property; viewMode: ViewMode; lang: Language; onClick: () => void }) {
+function PropertyCard({ property, viewMode, lang, darkMode, onClick }: { property: Property; viewMode: ViewMode; lang: Language; darkMode: boolean; onClick: () => void }) {
   const router = useRouter()
   const type = typeConfig[property.type]
   const TypeIcon = type.icon
@@ -635,7 +643,7 @@ function PropertyCard({ property, viewMode, lang, onClick }: { property: Propert
         </button>
         
         {/* Type Badge */}
-        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 shadow-lg">
+        <div className={darkMode ? 'absolute top-3 left-3 bg-[#E6A854]/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-[#001117] shadow-lg' : 'absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 shadow-lg'}>
           {type.label}
         </div>
       </div>
@@ -643,32 +651,32 @@ function PropertyCard({ property, viewMode, lang, onClick }: { property: Propert
       {/* Info - Compact */}
       <div className="px-1">
         <div className="flex items-start justify-between mb-1">
-          <h3 className="font-semibold text-slate-900 text-sm line-clamp-1 flex-1">
+          <h3 className={darkMode ? 'font-semibold text-white text-sm line-clamp-1 flex-1' : 'font-semibold text-slate-900 text-sm line-clamp-1 flex-1'}>
             {property.name}
           </h3>
           {viewMode === 'rent' && (
             <div className="flex items-center gap-1 ml-2">
-              <Star className="w-3.5 h-3.5 fill-slate-900 text-slate-900" />
-              <span className="text-xs font-semibold text-slate-900">4.9</span>
+              <Star className={darkMode ? 'w-3.5 h-3.5 fill-[#E6A854] text-[#E6A854]' : 'w-3.5 h-3.5 fill-slate-900 text-slate-900'} />
+              <span className={darkMode ? 'text-xs font-semibold text-[#E6A854]' : 'text-xs font-semibold text-slate-900'}>4.9</span>
             </div>
           )}
         </div>
         
-        <p className="text-xs text-slate-500 mb-2 line-clamp-1">{property.location}</p>
+        <p className={darkMode ? 'text-xs text-slate-400 mb-2 line-clamp-1' : 'text-xs text-slate-500 mb-2 line-clamp-1'}>{property.location}</p>
 
         {viewMode === 'rent' ? (
           <div className="flex items-baseline gap-1">
-            <span className="text-base font-bold text-slate-900">{formatCurrency(property.price_monthly)}</span>
-            <span className="text-xs text-slate-500 font-medium">{t('perMonth', lang)}</span>
+            <span className={darkMode ? 'text-base font-bold text-white' : 'text-base font-bold text-slate-900'}>{formatCurrency(property.price_monthly)}</span>
+            <span className={darkMode ? 'text-xs text-slate-400 font-medium' : 'text-xs text-slate-500 font-medium'}>{t('perMonth', lang)}</span>
           </div>
         ) : (
           <div>
             <div className="flex items-baseline gap-1 mb-1.5">
-              <span className="text-base font-bold text-slate-900">{formatCurrency(property.assets_value)}</span>
+              <span className={darkMode ? 'text-base font-bold text-white' : 'text-base font-bold text-slate-900'}>{formatCurrency(property.assets_value)}</span>
             </div>
-            <div className="flex items-center gap-1 bg-emerald-50 rounded-lg px-2 py-1">
-              <TrendingUp className="w-3 h-3 text-emerald-600" />
-              <span className="text-xs font-bold text-emerald-700">ROI {roi.toFixed(1)}%</span>
+            <div className={darkMode ? 'flex items-center gap-1 bg-[#E6A854]/10 rounded-lg px-2 py-1 border border-[#E6A854]/20' : 'flex items-center gap-1 bg-emerald-50 rounded-lg px-2 py-1'}>
+              <TrendingUp className={darkMode ? 'w-3 h-3 text-[#E6A854]' : 'w-3 h-3 text-emerald-600'} />
+              <span className={darkMode ? 'text-xs font-bold text-[#E6A854]' : 'text-xs font-bold text-emerald-700'}>ROI {roi.toFixed(1)}%</span>
             </div>
           </div>
         )}

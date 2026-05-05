@@ -4,14 +4,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Home, Building2, Calendar, TrendingUp, ArrowRight, Menu, X, Sun, Moon } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
+import { useThemeStore } from '@/store/useThemeStore'
 import { formatCurrency, calculateROI } from '@/lib/utils'
 
 export default function LandingPage() {
   const router = useRouter()
   const { properties } = usePropertyStore()
+  const { darkMode, toggleDarkMode } = useThemeStore()
   const availableProperties = properties.filter(p => p.status === 'available').slice(0, 6)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
 
   const handleCheckAvailability = () => {
     router.push('/public')
@@ -67,7 +68,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2">
               {/* Dark Mode Toggle */}
               <button
-                onClick={() => setDarkMode(!darkMode)}
+                onClick={toggleDarkMode}
                 className={darkMode ? 'p-2 bg-[#E6A854]/10 text-[#E6A854] rounded-lg hover:bg-[#E6A854]/20 transition' : 'p-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition'}
               >
                 {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}

@@ -284,7 +284,7 @@ export default function PublicPage() {
                 property={property}
                 viewMode={viewMode}
                 lang={lang}
-                onClick={() => router.push(`/public/${property.id}?lang=${lang}`)}
+                onClick={() => router.push(`/public/${property.id}?mode=${viewMode}&lang=${lang}`)}
               />
             ))}
           </div>

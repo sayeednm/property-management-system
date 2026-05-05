@@ -28,6 +28,10 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const router = useRouter()
   const { properties } = usePropertyStore()
   const [showBooking, setShowBooking] = useState(false)
+  
+  // Get viewMode from URL query
+  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+  const viewMode = (searchParams.get('mode') as 'rent' | 'invest') || 'rent'
 
   const property = properties.find((p) => p.id === id)
 
@@ -129,51 +133,85 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
             {/* Description */}
             <div className="pb-8 border-b border-[#E5E7EB]">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Tentang properti ini</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">
+                {viewMode === 'invest' ? 'Tentang investasi ini' : 'Tentang properti ini'}
+              </h2>
               <p className="text-slate-600 leading-relaxed">
-                {property.name} adalah hunian modern yang terletak strategis di {property.location}. 
-                Properti ini menawarkan kenyamanan maksimal dengan fasilitas lengkap dan akses mudah ke berbagai pusat aktivitas. 
-                Cocok untuk profesional muda, keluarga kecil, atau siapapun yang mencari hunian berkualitas di lokasi premium.
+                {viewMode === 'invest' ? (
+                  <>
+                    {property.name} adalah investasi properti yang menawarkan ROI {roi.toFixed(2)}% per tahun dengan nilai aset Rp {formatCurrency(property.assets_value)}. 
+                    Properti ini terletak strategis di {property.location} dengan potensi pendapatan pasif sebesar {formatCurrency(property.price_monthly)} per bulan atau {formatCurrency(property.price_monthly * 12)} per tahun. 
+                    Cocok untuk investor yang mencari passive income stabil dengan lokasi premium dan demand tinggi.
+                  </>
+                ) : (
+                  <>
+                    {property.name} adalah hunian modern yang terletak strategis di {property.location}. 
+                    Properti ini menawarkan kenyamanan maksimal dengan fasilitas lengkap dan akses mudah ke berbagai pusat aktivitas. 
+                    Cocok untuk profesional muda, keluarga kecil, atau siapapun yang mencari hunian berkualitas di lokasi premium.
+                  </>
+                )}
               </p>
             </div>
 
-            {/* Amenities */}
-            <div className="pb-8 border-b border-[#E5E7EB]">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Fasilitas</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {amenitiesIcons.map(({ icon: Icon, label }, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Icon className="w-5 h-5 text-slate-400" />
-                    <span className="text-slate-700">{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Investment Info (if relevant) */}
-            <div className="pb-8 border-b border-[#E5E7EB]">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Informasi Investasi</h2>
-              <div className="bg-emerald-50 rounded-2xl p-4 sm:p-6">
-                <div className="grid grid-cols-2 gap-4 sm:gap-6">
-                  <div>
-                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">Nilai Aset</p>
-                    <p className="text-lg sm:text-2xl font-bold text-slate-900 break-words">{formatCurrency(property.assets_value)}</p>
+            {viewMode === 'invest' && (
+              <div className="pb-8 border-b border-[#E5E7EB]">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Analisis Investasi</h2>
+                <div className="bg-emerald-50 rounded-2xl p-4 sm:p-6 mb-4">
+                  <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                    <div>
+                      <p className="text-xs sm:text-sm text-emerald-600 mb-1">Nilai Aset</p>
+                      <p className="text-lg sm:text-2xl font-bold text-slate-900 break-words">{formatCurrency(property.assets_value)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-emerald-600 mb-1">ROI Tahunan</p>
+                      <p className="text-lg sm:text-2xl font-bold text-emerald-700">{roi.toFixed(2)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-emerald-600 mb-1">Pendapatan/Bulan</p>
+                      <p className="text-sm sm:text-lg font-semibold text-slate-900 break-words">{formatCurrency(property.price_monthly)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-emerald-600 mb-1">Pendapatan/Tahun</p>
+                      <p className="text-sm sm:text-lg font-semibold text-slate-900 break-words">{formatCurrency(property.price_monthly * 12)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">ROI Tahunan</p>
-                    <p className="text-lg sm:text-2xl font-bold text-emerald-700">{roi.toFixed(2)}%</p>
+                </div>
+                <div className="space-y-3 text-sm text-slate-600">
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-semibold">✓</span>
+                    <p><strong>Payback Period:</strong> Sekitar {(100 / roi).toFixed(1)} tahun untuk balik modal penuh</p>
                   </div>
-                  <div>
-                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">Pendapatan/Bulan</p>
-                    <p className="text-sm sm:text-lg font-semibold text-slate-900 break-words">{formatCurrency(property.price_monthly)}</p>
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-semibold">✓</span>
+                    <p><strong>Passive Income:</strong> Pendapatan rutin setiap bulan tanpa perlu kerja aktif</p>
                   </div>
-                  <div>
-                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">Pendapatan/Tahun</p>
-                    <p className="text-sm sm:text-lg font-semibold text-slate-900 break-words">{formatCurrency(property.price_monthly * 12)}</p>
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-semibold">✓</span>
+                    <p><strong>Capital Gain:</strong> Potensi kenaikan nilai properti 5-10% per tahun</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-semibold">✓</span>
+                    <p><strong>Lokasi Strategis:</strong> Demand tinggi, occupancy rate stabil</p>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Amenities - Only show for rent mode */}
+            {viewMode === 'rent' && (
+              <div className="pb-8 border-b border-[#E5E7EB]">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Fasilitas</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {amenitiesIcons.map(({ icon: Icon, label }, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <Icon className="w-5 h-5 text-slate-400" />
+                      <span className="text-slate-700">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Reviews */}
             <div className="pb-8 border-b border-[#E5E7EB]">
@@ -216,22 +254,109 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                   <h3 className="font-semibold text-slate-800 mb-3">Kebijakan pembatalan</h3>
-                  <p className="text-sm text-slate-600 mb-2">
-                    Pembatalan gratis sebelum 31 Mei. Jika Anda membatalkan sebelum check-in pada tanggal 5 Juni, Anda akan mendapatkan pengembalian sebagian.
-                  </p>
+                  {property.type === 'kost' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Pembatalan minimal 7 hari sebelum tanggal masuk. Deposit tidak dapat dikembalikan.
+                      </p>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Sewa minimal 3 bulan untuk kost bulanan.
+                      </p>
+                    </>
+                  ) : property.type === 'apartment' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Pembatalan gratis hingga 14 hari sebelum check-in. Setelah itu, biaya pembatalan 50% dari total sewa.
+                      </p>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Kontrak minimal 6 bulan atau 1 tahun.
+                      </p>
+                    </>
+                  ) : property.type === 'villa' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Pembatalan gratis hingga 30 hari sebelum check-in. Pembatalan kurang dari 30 hari dikenakan biaya 100%.
+                      </p>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Deposit 30% dari total sewa.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Pembatalan gratis hingga 7 hari sebelum check-in. Setelah itu, biaya pembatalan 25% dari total sewa.
+                      </p>
+                      <p className="text-sm text-slate-600 mb-2">
+                        Sewa minimal 1 bulan.
+                      </p>
+                    </>
+                  )}
                   <button className="text-sm font-semibold underline">Pelajari selengkapnya</button>
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-800 mb-3">Peraturan rumah</h3>
-                  <p className="text-sm text-slate-600 mb-1">Check-in: 15:00 - 22:00</p>
-                  <p className="text-sm text-slate-600 mb-2">Check-out sebelum 12:00</p>
-                  <p className="text-sm text-slate-600 mb-2">Maksimum 5 tamu</p>
+                  {property.type === 'kost' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-1">Check-in: Fleksibel (24 jam)</p>
+                      <p className="text-sm text-slate-600 mb-2">Jam malam: 23:00</p>
+                      <p className="text-sm text-slate-600 mb-2">Tamu menginap tidak diperbolehkan</p>
+                      <p className="text-sm text-slate-600 mb-2">Dilarang merokok di dalam kamar</p>
+                    </>
+                  ) : property.type === 'apartment' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-1">Check-in: 14:00 - 22:00</p>
+                      <p className="text-sm text-slate-600 mb-2">Check-out sebelum 12:00</p>
+                      <p className="text-sm text-slate-600 mb-2">Maksimum 4 orang per unit</p>
+                      <p className="text-sm text-slate-600 mb-2">Hewan peliharaan tidak diperbolehkan</p>
+                    </>
+                  ) : property.type === 'villa' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-1">Check-in: 15:00 - 20:00</p>
+                      <p className="text-sm text-slate-600 mb-2">Check-out sebelum 11:00</p>
+                      <p className="text-sm text-slate-600 mb-2">Maksimum 8-10 tamu</p>
+                      <p className="text-sm text-slate-600 mb-2">Pesta/acara dengan izin tertulis</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-slate-600 mb-1">Check-in: 14:00 - 21:00</p>
+                      <p className="text-sm text-slate-600 mb-2">Check-out sebelum 12:00</p>
+                      <p className="text-sm text-slate-600 mb-2">Maksimum 4-6 tamu</p>
+                      <p className="text-sm text-slate-600 mb-2">Anak-anak diperbolehkan</p>
+                    </>
+                  )}
                   <button className="text-sm font-semibold underline">Pelajari selengkapnya</button>
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-800 mb-3">Keselamatan & properti</h3>
-                  <p className="text-sm text-slate-600 mb-2">Alarm karbon monoksida</p>
-                  <p className="text-sm text-slate-600 mb-2">Alarm asap</p>
+                  {property.type === 'kost' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">CCTV 24 jam</p>
+                      <p className="text-sm text-slate-600 mb-2">Satpam/penjaga kost</p>
+                      <p className="text-sm text-slate-600 mb-2">Alarm kebakaran</p>
+                      <p className="text-sm text-slate-600 mb-2">Akses kartu/kunci digital</p>
+                    </>
+                  ) : property.type === 'apartment' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">Alarm karbon monoksida</p>
+                      <p className="text-sm text-slate-600 mb-2">Alarm asap</p>
+                      <p className="text-sm text-slate-600 mb-2">Security 24 jam</p>
+                      <p className="text-sm text-slate-600 mb-2">Akses lift & parkir basement</p>
+                    </>
+                  ) : property.type === 'villa' ? (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">Pagar & gerbang otomatis</p>
+                      <p className="text-sm text-slate-600 mb-2">CCTV area luar</p>
+                      <p className="text-sm text-slate-600 mb-2">Kolam renang dengan pagar pengaman</p>
+                      <p className="text-sm text-slate-600 mb-2">Kotak P3K tersedia</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-slate-600 mb-2">Alarm asap</p>
+                      <p className="text-sm text-slate-600 mb-2">Pemadam api</p>
+                      <p className="text-sm text-slate-600 mb-2">Pintu & jendela aman</p>
+                      <p className="text-sm text-slate-600 mb-2">Area parkir tersedia</p>
+                    </>
+                  )}
                   <button className="text-sm font-semibold underline">Pelajari selengkapnya</button>
                 </div>
               </div>
@@ -257,10 +382,14 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 onClick={() => setShowBooking(true)}
                 className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition mb-4"
               >
-                Booking Sekarang
+                {viewMode === 'invest' ? 'Ajukan Penawaran' : 'Booking Sekarang'}
               </button>
 
-              <p className="text-xs text-center text-slate-400 mb-6">Anda tidak akan dikenakan biaya</p>
+              <p className="text-xs text-center text-slate-400 mb-6">
+                {viewMode === 'invest' 
+                  ? 'Tim kami akan menghubungi Anda untuk diskusi lebih lanjut' 
+                  : 'Anda tidak akan dikenakan biaya'}
+              </p>
 
               <div className="space-y-3 pt-6 border-t border-[#E5E7EB]">
                 <div className="flex items-center gap-3 text-sm">

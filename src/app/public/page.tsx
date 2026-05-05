@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp } from 'lucide-react'
+import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp, Globe } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
 import { Property, PropertyType } from '@/lib/supabase'
 import { formatCurrency, calculateROI, cn } from '@/lib/utils'
@@ -42,74 +42,177 @@ export default function PublicPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Navbar - Mobile Optimized */}
       <nav className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Home className="w-4 h-4 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          {/* Top row */}
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+              </div>
+              <span className="text-base sm:text-lg font-bold text-slate-800">PropStay</span>
             </div>
-            <span className="text-lg font-bold text-slate-800">PropStay</span>
+
+            {/* Language Toggle - Compact */}
+            <button
+              onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-200 transition"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {lang.toUpperCase()}
+            </button>
           </div>
-          <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
-            <button onClick={() => setViewMode('rent')} className={cn('px-4 py-2 rounded-full text-sm font-medium transition-all', viewMode === 'rent' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
+
+          {/* Mode Toggle - Full Width on Mobile */}
+          <div className="flex items-center gap-2 pb-3">
+            <button
+              onClick={() => setViewMode('rent')}
+              className={cn(
+                'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
+                viewMode === 'rent'
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600'
+              )}
+            >
               {t('rent', lang)}
             </button>
-            <button onClick={() => setViewMode('invest')} className={cn('px-4 py-2 rounded-full text-sm font-medium transition-all', viewMode === 'invest' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>
+            <button
+              onClick={() => setViewMode('invest')}
+              className={cn(
+                'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
+                viewMode === 'invest'
+                  ? 'bg-slate-900 text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600'
+              )}
+            >
               {t('invest', lang)}
             </button>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
-              <button onClick={() => setLang('id')} className={cn('px-3 py-1.5 rounded-full text-xs font-medium transition-all', lang === 'id' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>ID</button>
-              <button onClick={() => setLang('en')} className={cn('px-3 py-1.5 rounded-full text-xs font-medium transition-all', lang === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700')}>EN</button>
-            </div>
-            <div className="hidden md:flex items-center gap-6 text-sm text-slate-600">
-              <a href="#" className="hover:text-slate-900 transition">{t('about', lang)}</a>
-              <a href="#" className="hover:text-slate-900 transition">{t('contact', lang)}</a>
-            </div>
           </div>
         </div>
       </nav>
 
+      {/* Hero Section - Mobile Optimized */}
       <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-b border-[#E5E7EB]">
-        <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">{viewMode === 'rent' ? t('heroTitleRent', lang) : t('heroTitleInvest', lang)}</h1>
-          <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">{viewMode === 'rent' ? t('heroSubtitleRent', lang) : t('heroSubtitleInvest', lang)}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 text-center">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 leading-tight">
+            {viewMode === 'rent' ? t('heroTitleRent', lang) : t('heroTitleInvest', lang)}
+          </h1>
+          <p className="text-sm sm:text-lg text-slate-600 mb-6 sm:mb-10 max-w-2xl mx-auto px-4">
+            {viewMode === 'rent' ? t('heroSubtitleRent', lang) : t('heroSubtitleInvest', lang)}
+          </p>
+
+          {/* Search bar - Mobile Optimized */}
           <div className="relative max-w-2xl mx-auto">
-            <div className="bg-white rounded-full shadow-xl border border-[#E5E7EB] flex items-center px-6 py-4">
-              <Search className="w-5 h-5 text-slate-400 mr-3" />
-              <input type="text" placeholder={t('searchPlaceholder', lang)} value={search} onChange={(e) => setSearch(e.target.value)} className="flex-1 text-slate-700 placeholder-slate-400 focus:outline-none" />
-              <button className="ml-3 px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-full hover:shadow-lg transition">{t('searchButton', lang)}</button>
+            <div className="bg-white rounded-2xl sm:rounded-full shadow-xl border border-[#E5E7EB] flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-0 p-4 sm:px-6 sm:py-4">
+              <div className="flex items-center flex-1">
+                <Search className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder={t('searchPlaceholder', lang)}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="flex-1 text-slate-700 placeholder-slate-400 focus:outline-none text-sm sm:text-base"
+                />
+              </div>
+              <button className="w-full sm:w-auto sm:ml-3 px-6 py-2.5 sm:py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl sm:rounded-full hover:shadow-lg transition">
+                {t('searchButton', lang)}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="flex flex-wrap gap-3 mb-8">
-          {filterOptions.map((opt) => (
-            <button key={opt.value} onClick={() => setFilter(opt.value)} className={cn('px-5 py-2.5 rounded-full text-sm font-medium transition-all border', filter === opt.value ? 'bg-slate-900 text-white border-slate-900 shadow-md' : 'bg-white border-[#E5E7EB] text-slate-600 hover:border-slate-300 hover:shadow-sm')}>{opt.label}</button>
-          ))}
+      {/* Filter & Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        {/* Filter tabs - Horizontal Scroll on Mobile */}
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 mb-6 sm:mb-8">
+          <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0 sm:flex-wrap pb-2 sm:pb-0">
+            {filterOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setFilter(opt.value)}
+                className={cn(
+                  'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all border whitespace-nowrap',
+                  filter === opt.value
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                    : 'bg-white border-[#E5E7EB] text-slate-600'
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="mb-6"><p className="text-sm text-slate-500"><span className="font-semibold text-slate-900">{filtered.length}</span> {t('propertiesAvailable', lang)}</p></div>
+
+        {/* Stats */}
+        <div className="mb-4 sm:mb-6">
+          <p className="text-xs sm:text-sm text-slate-500">
+            <span className="font-semibold text-slate-900">{filtered.length}</span> {t('propertiesAvailable', lang)}
+          </p>
+        </div>
+
+        {/* Grid - Mobile Optimized */}
         {filtered.length === 0 ? (
-          <div className="text-center py-20 text-slate-400"><Home className="w-12 h-12 mx-auto mb-4 opacity-30" /><p className="text-sm">No properties found.</p></div>
+          <div className="text-center py-16 sm:py-20 text-slate-400">
+            <Home className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-30" />
+            <p className="text-sm">No properties found.</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filtered.map((property) => (<PropertyCard key={property.id} property={property} viewMode={viewMode} lang={lang} onClick={() => router.push(`/public/${property.id}?lang=${lang}`)} />))}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            {filtered.map((property) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                viewMode={viewMode}
+                lang={lang}
+                onClick={() => router.push(`/public/${property.id}?lang=${lang}`)}
+              />
+            ))}
           </div>
         )}
       </div>
 
-      <footer className="bg-slate-50 border-t border-[#E5E7EB] mt-20">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div><div className="flex items-center gap-2 mb-4"><div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center"><Home className="w-4 h-4 text-white" /></div><span className="text-lg font-bold text-slate-800">PropStay</span></div><p className="text-sm text-slate-500">{t('footerTagline', lang)}</p></div>
-            <div><h3 className="font-semibold text-slate-800 mb-3 text-sm">{t('about', lang)}</h3><ul className="space-y-2 text-sm text-slate-500"><li><a href="#" className="hover:text-slate-900">{t('aboutUs', lang)}</a></li><li><a href="#" className="hover:text-slate-900">{t('career', lang)}</a></li><li><a href="#" className="hover:text-slate-900">{t('blog', lang)}</a></li></ul></div>
-            <div><h3 className="font-semibold text-slate-800 mb-3 text-sm">{t('support', lang)}</h3><ul className="space-y-2 text-sm text-slate-500"><li><a href="#" className="hover:text-slate-900">{t('helpCenter', lang)}</a></li><li><a href="#" className="hover:text-slate-900">{t('contact', lang)}</a></li><li><a href="#" className="hover:text-slate-900">{t('faq', lang)}</a></li></ul></div>
-            <div><h3 className="font-semibold text-slate-800 mb-3 text-sm">{t('legal', lang)}</h3><ul className="space-y-2 text-sm text-slate-500"><li><a href="#" className="hover:text-slate-900">{t('terms', lang)}</a></li><li><a href="#" className="hover:text-slate-900">{t('privacy', lang)}</a></li></ul></div>
+      {/* Footer - Mobile Optimized */}
+      <footer className="bg-slate-50 border-t border-[#E5E7EB] mt-12 sm:mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+                </div>
+                <span className="text-base sm:text-lg font-bold text-slate-800">PropStay</span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500">{t('footerTagline', lang)}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-2 sm:mb-3 text-xs sm:text-sm">{t('about', lang)}</h3>
+              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-slate-500">
+                <li><a href="#" className="hover:text-slate-900">{t('aboutUs', lang)}</a></li>
+                <li><a href="#" className="hover:text-slate-900">{t('career', lang)}</a></li>
+                <li><a href="#" className="hover:text-slate-900">{t('blog', lang)}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-2 sm:mb-3 text-xs sm:text-sm">{t('support', lang)}</h3>
+              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-slate-500">
+                <li><a href="#" className="hover:text-slate-900">{t('helpCenter', lang)}</a></li>
+                <li><a href="#" className="hover:text-slate-900">{t('contact', lang)}</a></li>
+                <li><a href="#" className="hover:text-slate-900">{t('faq', lang)}</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-800 mb-2 sm:mb-3 text-xs sm:text-sm">{t('legal', lang)}</h3>
+              <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-slate-500">
+                <li><a href="#" className="hover:text-slate-900">{t('terms', lang)}</a></li>
+                <li><a href="#" className="hover:text-slate-900">{t('privacy', lang)}</a></li>
+              </ul>
+            </div>
           </div>
-          <div className="border-t border-[#E5E7EB] pt-6 text-center text-sm text-slate-400"><p>{t('copyright', lang)}</p></div>
+          <div className="border-t border-[#E5E7EB] pt-4 sm:pt-6 text-center text-xs sm:text-sm text-slate-400">
+            <p>{t('copyright', lang)}</p>
+          </div>
         </div>
       </footer>
     </div>
@@ -120,20 +223,65 @@ function PropertyCard({ property, viewMode, lang, onClick }: { property: Propert
   const type = typeConfig[property.type]
   const TypeIcon = type.icon
   const roi = calculateROI(property.price_monthly, property.assets_value)
+  
   return (
-    <div onClick={onClick} className="group cursor-pointer transform transition-all duration-300 hover:scale-[1.02]">
-      <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-3 shadow-md group-hover:shadow-2xl transition-all duration-300">
+    <div onClick={onClick} className="group cursor-pointer transform transition-all duration-300 active:scale-95 sm:hover:scale-[1.02]">
+      {/* Image - Optimized for Mobile */}
+      <div className="relative w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 shadow-md group-hover:shadow-2xl transition-all duration-300">
         <div className={cn('absolute inset-0 bg-gradient-to-br', type.gradient)} />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
-        <div className="absolute inset-0 flex items-center justify-center"><TypeIcon className="w-20 h-20 text-white/70 group-hover:scale-125 group-hover:text-white/90 transition-all duration-500" /></div>
-        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 shadow-lg">{type.label}</div>
-        {viewMode === 'rent' ? (<div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-800 shadow-lg flex items-center gap-1"><Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />4.9</div>) : (<div className="absolute top-3 right-3 bg-emerald-500 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg flex items-center gap-1"><TrendingUp className="w-3.5 h-3.5" />{roi.toFixed(1)}%</div>)}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <TypeIcon className="w-12 h-12 sm:w-20 sm:h-20 text-white/70 group-hover:scale-125 group-hover:text-white/90 transition-all duration-500" />
+        </div>
+        {/* Badge - Smaller on Mobile */}
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/95 backdrop-blur-md px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold text-slate-800 shadow-lg">
+          {type.label}
+        </div>
+        {/* Rating or ROI badge */}
+        {viewMode === 'rent' ? (
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/95 backdrop-blur-md px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold text-slate-800 shadow-lg flex items-center gap-0.5 sm:gap-1">
+            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
+            4.9
+          </div>
+        ) : (
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-emerald-500 backdrop-blur-md px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold text-white shadow-lg flex items-center gap-0.5 sm:gap-1">
+            <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            {roi.toFixed(1)}%
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
-      <div className="px-1">
-        <h3 className="font-bold text-slate-900 text-base mb-1.5 group-hover:text-indigo-600 transition-colors line-clamp-1">{property.name}</h3>
-        <div className="flex items-center gap-1.5 mb-3"><MapPin className="w-4 h-4 text-slate-400 flex-shrink-0" /><span className="text-sm text-slate-500 line-clamp-1 font-medium">{property.location}</span></div>
-        {viewMode === 'rent' ? (<div className="flex items-baseline gap-1.5"><span className="text-xl font-bold text-slate-900">{formatCurrency(property.price_monthly)}</span><span className="text-sm text-slate-500 font-medium">{t('perMonth', lang)}</span></div>) : (<div><div className="flex items-baseline gap-1 mb-1"><span className="text-xs text-slate-400 font-semibold uppercase tracking-wide">{t('assetValue', lang)}</span></div><div className="flex items-baseline gap-1 mb-2"><span className="text-xl font-bold text-slate-900">{formatCurrency(property.assets_value)}</span></div><div className="flex items-center gap-1.5 bg-emerald-50 rounded-lg px-2.5 py-1.5"><TrendingUp className="w-3.5 h-3.5 text-emerald-600" /><span className="text-xs font-bold text-emerald-700">{t('roiPerYear', lang, { roi: roi.toFixed(2) })}</span></div></div>)}
+
+      {/* Info - Compact on Mobile */}
+      <div className="px-0.5 sm:px-1">
+        <h3 className="font-bold text-slate-900 text-xs sm:text-base mb-1 sm:mb-1.5 group-hover:text-indigo-600 transition-colors line-clamp-1">
+          {property.name}
+        </h3>
+        
+        <div className="flex items-center gap-1 sm:gap-1.5 mb-2 sm:mb-3">
+          <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 flex-shrink-0" />
+          <span className="text-[10px] sm:text-sm text-slate-500 line-clamp-1 font-medium">{property.location}</span>
+        </div>
+
+        {viewMode === 'rent' ? (
+          <div className="flex items-baseline gap-1">
+            <span className="text-sm sm:text-xl font-bold text-slate-900">{formatCurrency(property.price_monthly)}</span>
+            <span className="text-[10px] sm:text-sm text-slate-500 font-medium">{t('perMonth', lang)}</span>
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-baseline gap-1 mb-0.5 sm:mb-1">
+              <span className="text-[9px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wide">{t('assetValue', lang)}</span>
+            </div>
+            <div className="flex items-baseline gap-1 mb-1.5 sm:mb-2">
+              <span className="text-sm sm:text-xl font-bold text-slate-900">{formatCurrency(property.assets_value)}</span>
+            </div>
+            <div className="flex items-center gap-1 sm:gap-1.5 bg-emerald-50 rounded-md sm:rounded-lg px-1.5 py-1 sm:px-2.5 sm:py-1.5">
+              <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600" />
+              <span className="text-[9px] sm:text-xs font-bold text-emerald-700">{t('roiPerYear', lang, { roi: roi.toFixed(2) })}</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

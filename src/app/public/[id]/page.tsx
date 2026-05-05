@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState } from 'react'
+import { use, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Star, MapPin, Wifi, Car, Coffee, Tv, Wind, Users, Home, Calendar, Shield, Award } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
@@ -28,10 +28,17 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const router = useRouter()
   const { properties } = usePropertyStore()
   const [showBooking, setShowBooking] = useState(false)
+  const [viewMode, setViewMode] = useState<'rent' | 'invest'>('rent')
   
-  // Get viewMode from URL query
-  const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
-  const viewMode = (searchParams.get('mode') as 'rent' | 'invest') || 'rent'
+  // Get viewMode from URL query on mount and when URL changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search)
+      const mode = (searchParams.get('mode') as 'rent' | 'invest') || 'rent'
+      setViewMode(mode)
+      console.log('🔍 Mode detected:', mode) // Debug log
+    }
+  }, [])
 
   const property = properties.find((p) => p.id === id)
 
@@ -68,11 +75,20 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             <ArrowLeft className="w-5 h-5" />
             <span className="font-medium">Kembali</span>
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
               <Home className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold text-slate-800">PropStay</span>
+            {/* Mode Indicator */}
+            <span className={cn(
+              'ml-2 px-3 py-1 rounded-full text-xs font-bold',
+              viewMode === 'invest' 
+                ? 'bg-emerald-100 text-emerald-700' 
+                : 'bg-indigo-100 text-indigo-700'
+            )}>
+              {viewMode === 'invest' ? '💰 INVEST MODE' : '🏠 RENT MODE'}
+            </span>
           </div>
         </div>
       </header>

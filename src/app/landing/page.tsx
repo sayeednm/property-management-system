@@ -13,6 +13,18 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
 
+  const handleCheckAvailability = () => {
+    router.push('/public')
+    // Scroll to search bar after navigation
+    setTimeout(() => {
+      const searchSection = document.querySelector('input[type="text"]') as HTMLInputElement
+      if (searchSection) {
+        searchSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        searchSection.focus()
+      }
+    }, 100)
+  }
+
   return (
     <div className={darkMode ? 'min-h-screen bg-[#001117] text-white' : 'min-h-screen bg-white text-slate-900'}>
       {/* Navbar */}
@@ -44,7 +56,7 @@ export default function LandingPage() {
                 Katalog
               </button>
               <button 
-                onClick={() => router.push('/public')}
+                onClick={handleCheckAvailability}
                 className={darkMode ? 'text-sm font-medium text-slate-300 hover:text-white' : 'text-sm font-medium text-slate-600 hover:text-slate-900'}
               >
                 Cek Ketersediaan
@@ -108,7 +120,7 @@ export default function LandingPage() {
               </button>
               <button 
                 onClick={() => {
-                  router.push('/public')
+                  handleCheckAvailability()
                   setMobileMenuOpen(false)
                 }}
                 className={darkMode ? 'block w-full text-left px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800 rounded-lg transition' : 'block w-full text-left px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition'}
@@ -146,7 +158,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <button
-                onClick={() => router.push('/public')}
+                onClick={handleCheckAvailability}
                 className={darkMode ? 'px-6 py-3 bg-gradient-to-r from-[#E6A854] to-[#D4AF37] text-[#001117] font-semibold rounded-full hover:shadow-lg hover:shadow-[#E6A854]/30 transition flex items-center gap-2' : 'px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#E6A854] text-white font-semibold rounded-full hover:shadow-lg transition flex items-center gap-2'}
               >
                 <Calendar className="w-5 h-5" />

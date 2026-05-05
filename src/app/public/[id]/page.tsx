@@ -2,10 +2,12 @@
 
 import { use, useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Star, MapPin, Wifi, Car, Coffee, Tv, Wind, Users, Home, Calendar, Shield, Award } from 'lucide-react'
+import { ArrowLeft, Star, MapPin, Wifi, Car, Coffee, Tv, Wind, Users, Home, Calendar, Shield, Award, Image } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
 import { formatCurrency, calculateROI, cn } from '@/lib/utils'
 import PublicBookingModal from '@/components/PublicBookingModal'
+import PhotoGalleryModal from '@/components/PhotoGalleryModal'
+import BookingCalendar from '@/components/BookingCalendar'
 
 const amenitiesIcons = [
   { icon: Wifi, label: 'WiFi Gratis' },
@@ -28,7 +30,11 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   const router = useRouter()
   const { properties } = usePropertyStore()
   const [showBooking, setShowBooking] = useState(false)
+  const [showPhotoGallery, setShowPhotoGallery] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [checkInDate, setCheckInDate] = useState<Date | null>(null)
+  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null)
+  const [guests, setGuests] = useState({ adults: 1, children: 0, infants: 0 })
   
   // Set mounted on client side
   useEffect(() => {
@@ -130,12 +136,21 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         {/* Photo Gallery */}
-        <div className="grid grid-cols-4 gap-2 rounded-2xl overflow-hidden mb-6 sm:mb-8 h-64 sm:h-80 md:h-96">
+        <div className="relative grid grid-cols-4 gap-2 rounded-2xl overflow-hidden mb-6 sm:mb-8 h-64 sm:h-80 md:h-96">
           <div className={cn('col-span-2 row-span-2 bg-gradient-to-br', typeConfig[property.type].gradient)} />
           <div className={cn('bg-gradient-to-br opacity-80', typeConfig[property.type].gradient)} />
           <div className={cn('bg-gradient-to-br opacity-70', typeConfig[property.type].gradient)} />
           <div className={cn('bg-gradient-to-br opacity-60', typeConfig[property.type].gradient)} />
           <div className={cn('bg-gradient-to-br opacity-50', typeConfig[property.type].gradient)} />
+          
+          {/* Show all photos button */}
+          <button
+            onClick={() => setShowPhotoGallery(true)}
+            className="absolute bottom-4 right-4 px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center gap-2 shadow-lg"
+          >
+            <Image className="w-4 h-4" />
+            Lihat semua foto
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -402,11 +417,26 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
+              {/* Booking Calendar - Only for Rent Mode */}
+              {viewMode === 'rent' && (
+                <div className="mb-4">
+                  <BookingCalendar
+                    onDateSelect={(checkIn, checkOut) => {
+                      setCheckInDate(checkIn)
+                      setCheckOutDate(checkOut)
+                    }}
+                    onGuestChange={(adults, children, infants) => {
+                      setGuests({ adults, children, infants })
+                    }}
+                  />
+                </div>
+              )}
+
               <button
                 onClick={() => setShowBooking(true)}
                 className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm sm:text-base font-semibold rounded-xl hover:shadow-lg transition mb-3 sm:mb-4"
               >
-                {viewMode === 'invest' ? 'Ajukan Penawaran' : 'Booking Sekarang'}
+                {viewMode === 'invest' ? 'Ajukan Penawaran' : 'Periksa ketersediaan'}
               </button>
 
               <p className="text-[10px] sm:text-xs text-center text-slate-400 mb-4 sm:mb-6">
@@ -414,6 +444,28 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                   ? 'Tim kami akan menghubungi Anda untuk diskusi lebih lanjut' 
                   : 'Anda tidak akan dikenakan biaya'}
               </p>
+
+              {/* Price Breakdown - Only for Rent Mode with dates selected */}
+              {viewMode === 'rent' && checkInDate && checkOutDate && (
+                <div className="mb-4 pb-4 border-b border-[#E5E7EB] space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">
+                      {formatCurrency(property.price_daily)} x {Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24))} malam
+                    </span>
+                    <span className="font-semibold text-slate-900">
+                      {formatCurrency(property.price_daily * Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">Biaya layanan</span>
+                    <span className="font-semibold text-slate-900">Rp 0</span>
+                  </div>
+                  <div className="flex justify-between text-base font-bold pt-2 border-t border-[#E5E7EB]">
+                    <span>Total</span>
+                    <span>{formatCurrency(property.price_daily * Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)))}</span>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2 sm:space-y-3 pt-4 sm:pt-6 border-t border-[#E5E7EB]">
                 <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
@@ -426,14 +478,6 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
                   <Award className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
-                  <span className="text-slate-600">Pembayaran aman</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <Calendar className="w-5 h-5 text-slate-400" />
-                  <span className="text-slate-600">Fleksibel check-in</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <Award className="w-5 h-5 text-slate-400" />
                   <span className="text-slate-600">Host terverifikasi</span>
                 </div>
               </div>
@@ -479,6 +523,14 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
           property={property}
           mode={viewMode}
           onClose={() => setShowBooking(false)}
+        />
+      )}
+
+      {/* Photo Gallery Modal */}
+      {showPhotoGallery && (
+        <PhotoGalleryModal
+          property={property}
+          onClose={() => setShowPhotoGallery(false)}
         />
       )}
     </div>

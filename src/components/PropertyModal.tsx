@@ -30,6 +30,7 @@ export default function PropertyModal({ property, onClose }: Props) {
   const [success, setSuccess] = useState(false)
   const [form, setForm] = useState({
     customerName: '',
+    customerEmail: '',
     customerType: 'rent' as CustomerType,
     checkIn: '',
     duration: '1',
@@ -44,6 +45,8 @@ export default function PropertyModal({ property, onClose }: Props) {
   const validate = () => {
     const e: Record<string, string> = {}
     if (!form.customerName.trim()) e.customerName = 'Nama customer wajib diisi'
+    if (!form.customerEmail.trim()) e.customerEmail = 'Email wajib diisi'
+    else if (!/\S+@\S+\.\S+/.test(form.customerEmail)) e.customerEmail = 'Email tidak valid'
     if (!form.checkIn) e.checkIn = 'Tanggal check-in wajib diisi'
     if (!form.duration || Number(form.duration) < 1) e.duration = 'Durasi minimal 1 bulan'
     return e
@@ -56,6 +59,7 @@ export default function PropertyModal({ property, onClose }: Props) {
     addBooking({
       propertyId: property.id,
       customerName: form.customerName.trim(),
+      customerEmail: form.customerEmail.trim(),
       customerType: form.customerType,
       checkIn: form.checkIn,
       duration: Number(form.duration),
@@ -149,6 +153,18 @@ export default function PropertyModal({ property, onClose }: Props) {
                   className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
                 />
                 {errors.customerName && <p className="text-xs text-red-500 mt-1">{errors.customerName}</p>}
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">Email Customer</label>
+                <input
+                  type="email"
+                  value={form.customerEmail}
+                  onChange={(e) => setForm({ ...form, customerEmail: e.target.value })}
+                  placeholder="contoh@email.com"
+                  className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
+                />
+                {errors.customerEmail && <p className="text-xs text-red-500 mt-1">{errors.customerEmail}</p>}
               </div>
 
               {/* Customer Type */}

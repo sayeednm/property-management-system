@@ -63,6 +63,17 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
       </header>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+          <button onClick={() => router.push('/public')} className="hover:text-slate-900">PropStay</button>
+          <span>›</span>
+          <span>Jawa Tengah</span>
+          <span>›</span>
+          <span>Semarang</span>
+          <span>›</span>
+          <span className="text-slate-900">{property.name}</span>
+        </div>
+
         {/* Title & Rating */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">{property.name}</h1>
@@ -178,12 +189,39 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* Location */}
-            <div>
+            <div className="pb-8 border-b border-[#E5E7EB]">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Lokasi</h2>
               <div className="bg-slate-100 rounded-2xl h-64 flex items-center justify-center">
                 <div className="text-center">
                   <MapPin className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                   <p className="text-sm text-slate-500">{property.location}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Things to Know */}
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900 mb-6">Hal yang perlu diketahui</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-3">Kebijakan pembatalan</h3>
+                  <p className="text-sm text-slate-600 mb-2">
+                    Pembatalan gratis sebelum 31 Mei. Jika Anda membatalkan sebelum check-in pada tanggal 5 Juni, Anda akan mendapatkan pengembalian sebagian.
+                  </p>
+                  <button className="text-sm font-semibold underline">Pelajari selengkapnya</button>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-3">Peraturan rumah</h3>
+                  <p className="text-sm text-slate-600 mb-1">Check-in: 15:00 - 22:00</p>
+                  <p className="text-sm text-slate-600 mb-2">Check-out sebelum 12:00</p>
+                  <p className="text-sm text-slate-600 mb-2">Maksimum 5 tamu</p>
+                  <button className="text-sm font-semibold underline">Pelajari selengkapnya</button>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-3">Keselamatan & properti</h3>
+                  <p className="text-sm text-slate-600 mb-2">Alarm karbon monoksida</p>
+                  <p className="text-sm text-slate-600 mb-2">Alarm asap</p>
+                  <button className="text-sm font-semibold underline">Pelajari selengkapnya</button>
                 </div>
               </div>
             </div>
@@ -228,6 +266,23 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Explore More */}
+        <div className="mt-16 pt-12 border-t border-[#E5E7EB]">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-6">Telusuri pilihan lainnya di Semarang dan sekitarnya</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {['Semarang', 'Bandungan', 'Ungaran', 'Ambarawa', 'Bawen', 'Kota Lama', 'Simpang Lima', 'Pandanaran'].map((loc) => (
+              <button
+                key={loc}
+                onClick={() => router.push('/public')}
+                className="text-left hover:bg-slate-50 p-4 rounded-xl transition"
+              >
+                <p className="font-semibold text-slate-800">{loc}</p>
+                <p className="text-sm text-slate-400">Sewa tempat liburan</p>
+              </button>
+            ))}
           </div>
         </div>
       </div>

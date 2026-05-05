@@ -284,7 +284,7 @@ export default function PublicPage() {
                 property={property}
                 viewMode={viewMode}
                 lang={lang}
-                onClick={() => router.push(`/public/${property.id}?mode=${viewMode}&lang=${lang}`)}
+                onClick={() => {}} // Not used anymore, handled inside PropertyCard
               />
             ))}
           </div>
@@ -393,6 +393,7 @@ export default function PublicPage() {
 }
 
 function PropertyCard({ property, viewMode, lang, onClick }: { property: Property; viewMode: ViewMode; lang: Language; onClick: () => void }) {
+  const router = useRouter()
   const type = typeConfig[property.type]
   const TypeIcon = type.icon
   const roi = calculateROI(property.price_monthly, property.assets_value)
@@ -404,8 +405,12 @@ function PropertyCard({ property, viewMode, lang, onClick }: { property: Propert
     toggleFavorite(property.id)
   }
   
+  const handleCardClick = () => {
+    router.push(`/public/${property.id}?mode=${viewMode}&lang=${lang}`)
+  }
+  
   return (
-    <div onClick={onClick} className="group cursor-pointer transform transition-all duration-300 active:scale-95">
+    <div onClick={handleCardClick} className="group cursor-pointer transform transition-all duration-300 active:scale-95">
       {/* Image - Optimized for Mobile */}
       <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-3 shadow-md group-hover:shadow-xl transition-all duration-300">
         <div className={cn('absolute inset-0 bg-gradient-to-br', type.gradient)} />

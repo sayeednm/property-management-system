@@ -42,11 +42,11 @@ export default function PublicPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navbar - Mobile Optimized */}
+      {/* Navbar - Clean Single Row */}
       <nav className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {/* Top row */}
-          <div className="flex items-center justify-between py-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-4">
+            {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
@@ -54,39 +54,39 @@ export default function PublicPage() {
               <span className="text-base sm:text-lg font-bold text-slate-800">PropStay</span>
             </div>
 
-            {/* Language Toggle - Compact */}
+            {/* Center - Mode Toggle */}
+            <div className="flex items-center gap-1.5 bg-slate-100 rounded-full p-1">
+              <button
+                onClick={() => setViewMode('rent')}
+                className={cn(
+                  'px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
+                  viewMode === 'rent'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600'
+                )}
+              >
+                {t('rent', lang)}
+              </button>
+              <button
+                onClick={() => setViewMode('invest')}
+                className={cn(
+                  'px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
+                  viewMode === 'invest'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600'
+                )}
+              >
+                {t('invest', lang)}
+              </button>
+            </div>
+
+            {/* Right - Language Toggle */}
             <button
               onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium text-slate-700 hover:bg-slate-200 transition"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-100 rounded-full text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
             >
               <Globe className="w-3.5 h-3.5" />
-              {lang.toUpperCase()}
-            </button>
-          </div>
-
-          {/* Mode Toggle - Full Width on Mobile */}
-          <div className="flex items-center gap-2 pb-3">
-            <button
-              onClick={() => setViewMode('rent')}
-              className={cn(
-                'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
-                viewMode === 'rent'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600'
-              )}
-            >
-              {t('rent', lang)}
-            </button>
-            <button
-              onClick={() => setViewMode('invest')}
-              className={cn(
-                'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
-                viewMode === 'invest'
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600'
-              )}
-            >
-              {t('invest', lang)}
+              <span className="hidden sm:inline">{lang.toUpperCase()}</span>
             </button>
           </div>
         </div>

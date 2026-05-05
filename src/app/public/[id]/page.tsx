@@ -69,7 +69,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     properties
       .filter(p => p.id !== property.id)
       .map(p => {
-        // Extract area from location (e.g., "Simpang Lima, Semarang" -> "Simpang Lima")
+        // Extract area from location (e.g., "Malioboro, Yogyakarta" -> "Malioboro")
         const parts = p.location.split(',')
         return parts[0].trim()
       })

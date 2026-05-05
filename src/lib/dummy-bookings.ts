@@ -42,7 +42,7 @@ export const dummyBookings: Booking[] = [
   },
   {
     id: 'booking-4',
-    propertyId: '6', // Apartment Ciputra Semarang
+    propertyId: '6', // Apartment Seturan City
     userId: 'user-4',
     customerName: 'Dewi Lestari',
     customerEmail: 'dewi.lestari@email.com',

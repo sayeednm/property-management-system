@@ -9,9 +9,9 @@ export const translations = {
     contact: 'Kontak',
     
     // Hero
-    heroTitleRent: 'Temukan Hunian Impian di Jawa Tengah',
+    heroTitleRent: 'Temukan Hunian Impian di Yogyakarta',
     heroTitleInvest: 'Investasi Properti Menguntungkan',
-    heroSubtitleRent: 'Properti berkualitas di Semarang dan sekitarnya. Kost, Apartment, Villa, dan Homestay dengan harga terjangkau.',
+    heroSubtitleRent: 'Properti berkualitas di Yogyakarta. Kost, Apartment, Villa, dan Homestay dengan harga terjangkau.',
     heroSubtitleInvest: 'Analisis ROI transparan untuk setiap properti. Temukan investasi terbaik dengan return optimal.',
     searchPlaceholder: 'Cari lokasi atau nama properti...',
     searchButton: 'Cari',
@@ -66,7 +66,7 @@ export const translations = {
     securePayment: 'Pembayaran aman',
     flexibleCheckin: 'Fleksibel check-in',
     verifiedHostBadge: 'Host terverifikasi',
-    exploreMore: 'Telusuri pilihan lainnya di Semarang dan sekitarnya',
+    exploreMore: 'Telusuri pilihan lainnya di Yogyakarta',
     rentalPlace: 'Sewa tempat liburan',
   },
   en: {
@@ -77,9 +77,9 @@ export const translations = {
     contact: 'Contact',
     
     // Hero
-    heroTitleRent: 'Find Your Dream Home in Central Java',
+    heroTitleRent: 'Find Your Dream Home in Yogyakarta',
     heroTitleInvest: 'Profitable Property Investment',
-    heroSubtitleRent: 'Quality properties in Semarang and surrounding areas. Kost, Apartments, Villas, and Homestays at affordable prices.',
+    heroSubtitleRent: 'Quality properties in Yogyakarta. Kost, Apartments, Villas, and Homestays at affordable prices.',
     heroSubtitleInvest: 'Transparent ROI analysis for every property. Find the best investment with optimal returns.',
     searchPlaceholder: 'Search location or property name...',
     searchButton: 'Search',
@@ -134,7 +134,7 @@ export const translations = {
     securePayment: 'Secure payment',
     flexibleCheckin: 'Flexible check-in',
     verifiedHostBadge: 'Verified host',
-    exploreMore: 'Explore more options in Semarang and surrounding areas',
+    exploreMore: 'Explore more options in Yogyakarta',
     rentalPlace: 'Vacation rentals',
   },
 }

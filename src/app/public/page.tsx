@@ -106,7 +106,7 @@ export default function PublicPage() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
               </div>
-              <span className="text-base sm:text-lg font-bold text-slate-800">PropStay</span>
+              <span className="text-base sm:text-lg font-bold text-slate-800">StayVest</span>
             </div>
 
             {/* Center - Mode Toggle & Favorites */}
@@ -208,10 +208,21 @@ export default function PublicPage() {
         </div>
       </nav>
 
-      {/* Hero Section - Mobile Optimized */}
+      {/* Hero Section - Mobile Optimized with Background Image */}
       {!showFavorites && (
-        <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-b border-[#E5E7EB]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 text-center">
+        <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-b border-[#E5E7EB] overflow-hidden">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=80" 
+              alt="Background"
+              className="w-full h-full object-cover opacity-20"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/90 via-purple-50/90 to-pink-50/90" />
+          </div>
+
+          {/* Content */}
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 text-center">
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 leading-tight">
               {viewMode === 'rent' ? t('heroTitleRent', lang) : t('heroTitleInvest', lang)}
             </h1>
@@ -221,7 +232,7 @@ export default function PublicPage() {
 
             {/* Search bar - Mobile Optimized */}
             <div className="relative max-w-2xl mx-auto">
-              <div className="bg-white rounded-2xl sm:rounded-full shadow-xl border border-[#E5E7EB] flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-0 p-4 sm:px-6 sm:py-4">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-full shadow-xl border border-[#E5E7EB] flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-0 p-4 sm:px-6 sm:py-4">
                 <div className="flex items-center flex-1">
                   <Search className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
                   <input
@@ -229,7 +240,7 @@ export default function PublicPage() {
                     placeholder={t('searchPlaceholder', lang)}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="flex-1 text-slate-700 placeholder-slate-400 focus:outline-none text-sm sm:text-base"
+                    className="flex-1 text-slate-700 placeholder-slate-400 focus:outline-none text-sm sm:text-base bg-transparent"
                   />
                 </div>
                 <button className="w-full sm:w-auto sm:ml-3 px-6 py-2.5 sm:py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl sm:rounded-full hover:shadow-lg transition">
@@ -447,7 +458,7 @@ export default function PublicPage() {
                 <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                 </div>
-                <span className="text-base sm:text-lg font-bold text-slate-800">PropStay</span>
+                <span className="text-base sm:text-lg font-bold text-slate-800">StayVest</span>
               </div>
               <p className="text-xs sm:text-sm text-slate-500">{t('footerTagline', lang)}</p>
             </div>

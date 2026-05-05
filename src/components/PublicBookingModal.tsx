@@ -269,15 +269,16 @@ export default function PublicBookingModal({ property, mode = 'rent', onClose }:
                         type="date"
                         value={form.checkIn}
                         onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
+                        className="w-full px-3 py-2.5 pr-10 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
                       />
                       {form.checkIn && (
                         <button
                           type="button"
                           onClick={() => setForm({ ...form, checkIn: '' })}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600 hover:text-slate-800 transition z-10"
+                          title="Hapus tanggal"
                         >
-                          <X className="w-4 h-4" />
+                          <X className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>

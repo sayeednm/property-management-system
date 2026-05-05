@@ -42,12 +42,12 @@ export const translations = {
     legal: 'Legal',
     terms: 'Syarat & Ketentuan',
     privacy: 'Kebijakan Privasi',
-    copyright: '© 2025 PropStay. Semua hak dilindungi.',
+    copyright: '© 2025 StayVest. Semua hak dilindungi.',
     
     // Detail page
     back: 'Kembali',
     reviews: 'ulasan',
-    managedBy: 'Dikelola oleh PropStay',
+    managedBy: 'Dikelola oleh StayVest',
     verifiedHost: 'Verified Host · 5 tahun pengalaman',
     aboutProperty: 'Tentang properti ini',
     facilities: 'Fasilitas',
@@ -110,12 +110,12 @@ export const translations = {
     legal: 'Legal',
     terms: 'Terms & Conditions',
     privacy: 'Privacy Policy',
-    copyright: '© 2025 PropStay. All rights reserved.',
+    copyright: '© 2025 StayVest. All rights reserved.',
     
     // Detail page
     back: 'Back',
     reviews: 'reviews',
-    managedBy: 'Managed by PropStay',
+    managedBy: 'Managed by StayVest',
     verifiedHost: 'Verified Host · 5 years experience',
     aboutProperty: 'About this property',
     facilities: 'Facilities',

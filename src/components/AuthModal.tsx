@@ -63,11 +63,11 @@ export default function AuthModal({ onClose, lang }: AuthModalProps) {
           <h2 className="text-xl font-bold text-slate-900">
             {mode === 'login'
               ? lang === 'id'
-                ? 'Masuk ke PropStay'
-                : 'Login to PropStay'
+                ? 'Masuk ke StayVest'
+                : 'Login to StayVest'
               : lang === 'id'
-              ? 'Daftar PropStay'
-              : 'Register PropStay'}
+              ? 'Daftar StayVest'
+              : 'Register StayVest'}
           </h2>
           <button
             onClick={onClose}

@@ -16,10 +16,11 @@ const typeConfig = {
 
 interface Props {
   property: Property
+  mode?: 'rent' | 'invest'
   onClose: () => void
 }
 
-export default function PublicBookingModal({ property, onClose }: Props) {
+export default function PublicBookingModal({ property, mode = 'rent', onClose }: Props) {
   const { addBooking } = usePropertyStore()
   const { currentUser, isAuthenticated } = useUserStore()
   const [success, setSuccess] = useState(false)
@@ -53,8 +54,13 @@ export default function PublicBookingModal({ property, onClose }: Props) {
     if (!form.customerName.trim()) e.customerName = 'Nama wajib diisi'
     if (!form.customerEmail.trim()) e.customerEmail = 'Email wajib diisi'
     else if (!/\S+@\S+\.\S+/.test(form.customerEmail)) e.customerEmail = 'Email tidak valid'
-    if (!form.checkIn) e.checkIn = 'Tanggal check-in wajib diisi'
-    if (!form.duration || Number(form.duration) < 1) e.duration = 'Durasi minimal 1 bulan'
+    
+    // Only validate check-in and duration for rent mode
+    if (mode === 'rent') {
+      if (!form.checkIn) e.checkIn = 'Tanggal check-in wajib diisi'
+      if (!form.duration || Number(form.duration) < 1) e.duration = 'Durasi minimal 1 bulan'
+    }
+    
     return e
   }
 
@@ -69,9 +75,9 @@ export default function PublicBookingModal({ property, onClose }: Props) {
       customerName: form.customerName.trim(),
       customerEmail: form.customerEmail.trim(),
       customerPhone: form.customerPhone.trim(),
-      customerType: 'rent',
-      checkIn: form.checkIn,
-      duration: Number(form.duration),
+      customerType: mode === 'invest' ? 'buyer' : 'rent',
+      checkIn: mode === 'rent' ? form.checkIn : new Date().toISOString().split('T')[0],
+      duration: mode === 'rent' ? Number(form.duration) : 12, // Default 12 months for investment
     })
     setSuccess(true)
   }
@@ -107,16 +113,34 @@ export default function PublicBookingModal({ property, onClose }: Props) {
           </span>
 
           {/* Pricing */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="bg-[#F9FAFB] rounded-xl p-3">
-              <p className="text-xs text-slate-400 mb-1">Harga/Bulan</p>
-              <p className="text-sm font-bold text-slate-800">{formatCurrency(property.price_monthly)}</p>
+          {mode === 'rent' ? (
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-[#F9FAFB] rounded-xl p-3">
+                <p className="text-xs text-slate-400 mb-1">Harga/Bulan</p>
+                <p className="text-sm font-bold text-slate-800">{formatCurrency(property.price_monthly)}</p>
+              </div>
+              <div className="bg-[#F9FAFB] rounded-xl p-3">
+                <p className="text-xs text-slate-400 mb-1">Harga/Hari</p>
+                <p className="text-sm font-bold text-slate-800">{formatCurrency(property.price_daily)}</p>
+              </div>
             </div>
-            <div className="bg-[#F9FAFB] rounded-xl p-3">
-              <p className="text-xs text-slate-400 mb-1">Harga/Hari</p>
-              <p className="text-sm font-bold text-slate-800">{formatCurrency(property.price_daily)}</p>
+          ) : (
+            <div className="bg-emerald-50 rounded-xl p-4 mb-4">
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div>
+                  <p className="text-xs text-emerald-600 mb-1">Nilai Aset</p>
+                  <p className="text-lg font-bold text-slate-900">{formatCurrency(property.assets_value)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-emerald-600 mb-1">ROI Tahunan</p>
+                  <p className="text-lg font-bold text-emerald-700">{roi.toFixed(2)}%</p>
+                </div>
+              </div>
+              <div className="text-xs text-slate-600">
+                <p>💰 Pendapatan: {formatCurrency(property.price_monthly)}/bulan</p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Success state */}
           {success ? (
@@ -124,9 +148,13 @@ export default function PublicBookingModal({ property, onClose }: Props) {
               <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-3">
                 <CheckCircle className="w-6 h-6 text-emerald-500" />
               </div>
-              <p className="font-semibold text-slate-800 mb-1">Booking Request Terkirim!</p>
+              <p className="font-semibold text-slate-800 mb-1">
+                {mode === 'invest' ? 'Penawaran Investasi Terkirim!' : 'Booking Request Terkirim!'}
+              </p>
               <p className="text-sm text-slate-400 mb-4">
-                Kami akan menghubungi Anda segera untuk konfirmasi booking.
+                {mode === 'invest' 
+                  ? 'Tim kami akan menghubungi Anda untuk diskusi investasi lebih lanjut.'
+                  : 'Kami akan menghubungi Anda segera untuk konfirmasi booking.'}
               </p>
               <button
                 onClick={onClose}
@@ -137,7 +165,9 @@ export default function PublicBookingModal({ property, onClose }: Props) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <p className="text-sm font-semibold text-slate-700">Form Booking</p>
+              <p className="text-sm font-semibold text-slate-700">
+                {mode === 'invest' ? 'Form Penawaran Investasi' : 'Form Booking'}
+              </p>
 
               {/* Name */}
               <div>
@@ -184,40 +214,45 @@ export default function PublicBookingModal({ property, onClose }: Props) {
                 />
               </div>
 
-              {/* Check-in */}
-              <div>
-                <label className="text-xs font-medium text-slate-500 mb-1 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> Tanggal Check-in
-                </label>
-                <input
-                  type="date"
-                  value={form.checkIn}
-                  onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
-                />
-                {errors.checkIn && <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>}
-              </div>
+              {/* Check-in & Duration - Only for Rent Mode */}
+              {mode === 'rent' && (
+                <>
+                  {/* Check-in */}
+                  <div>
+                    <label className="text-xs font-medium text-slate-500 mb-1 flex items-center gap-1">
+                      <Calendar className="w-3 h-3" /> Tanggal Check-in
+                    </label>
+                    <input
+                      type="date"
+                      value={form.checkIn}
+                      onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
+                    />
+                    {errors.checkIn && <p className="text-xs text-red-500 mt-1">{errors.checkIn}</p>}
+                  </div>
 
-              {/* Duration */}
-              <div>
-                <label className="text-xs font-medium text-slate-500 mb-1 flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> Durasi Sewa (bulan)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={form.duration}
-                  onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                  className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
-                />
-                {errors.duration && <p className="text-xs text-red-500 mt-1">{errors.duration}</p>}
-              </div>
+                  {/* Duration */}
+                  <div>
+                    <label className="text-xs font-medium text-slate-500 mb-1 flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Durasi Sewa (bulan)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={form.duration}
+                      onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-[#E5E7EB] rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition"
+                    />
+                    {errors.duration && <p className="text-xs text-red-500 mt-1">{errors.duration}</p>}
+                  </div>
+                </>
+              )}
 
               <button
                 type="submit"
                 className="w-full py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition"
               >
-                Kirim Booking Request
+                {mode === 'invest' ? 'Kirim Penawaran Investasi' : 'Kirim Booking Request'}
               </button>
             </form>
           )}

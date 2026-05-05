@@ -93,7 +93,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 ? 'bg-emerald-100 text-emerald-700' 
                 : 'bg-indigo-100 text-indigo-700'
             )}>
-              {viewMode === 'invest' ? '💰 INVEST MODE' : '🏠 RENT MODE'}
+              {viewMode === 'invest' ? 'INVEST MODE' : 'RENT MODE'}
             </span>
           </div>
         </div>
@@ -467,6 +467,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
       {showBooking && (
         <PublicBookingModal
           property={property}
+          mode={viewMode}
           onClose={() => setShowBooking(false)}
         />
       )}

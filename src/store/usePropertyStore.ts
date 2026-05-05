@@ -104,15 +104,15 @@ export const usePropertyStore = create<PropertyStore>()(
     }),
     {
       name: 'pms-storage',
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         properties: state.properties,
         bookings: state.bookings,
         favorites: state.favorites,
       }),
       migrate: (persistedState: any, version: number) => {
-        // If old version, reset to default
-        if (version < 3) {
+        // If old version, reset to default with new Yogyakarta data
+        if (version < 4) {
           return {
             properties: dummyProperties,
             bookings: dummyBookings,

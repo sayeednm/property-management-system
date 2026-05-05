@@ -103,15 +103,18 @@ export default function PublicPage() {
       <nav className={darkMode ? 'sticky top-0 z-40 bg-[#001117]/95 backdrop-blur-sm border-b border-[#E6A854]/20 shadow-sm' : 'sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-4">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
+            {/* Logo - clickable to go back to home */}
+            <button
+              onClick={() => router.push('/landing')}
+              className="flex items-center gap-2 hover:opacity-80 transition"
+            >
               <div className={darkMode ? 'w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-[#E6A854] to-[#D4AF37] rounded-lg flex items-center justify-center' : 'w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-[#D4AF37] to-[#E6A854] rounded-lg flex items-center justify-center'}>
                 <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#001117]" />
               </div>
               <span className={darkMode ? 'text-base sm:text-lg font-bold text-white' : 'text-base sm:text-lg font-bold text-slate-800'}>
                 STAY<span className="text-[#E6A854]">VEST</span>
               </span>
-            </div>
+            </button>
 
             {/* Center - Mode Toggle & Favorites */}
             <div className="flex items-center gap-2">

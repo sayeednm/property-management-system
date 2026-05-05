@@ -40,6 +40,17 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
   }
 
   const roi = calculateROI(property.price_monthly, property.assets_value)
+  
+  // Get unique locations from all properties, excluding current property's location
+  const allLocations = Array.from(new Set(
+    properties
+      .filter(p => p.id !== property.id)
+      .map(p => {
+        // Extract area from location (e.g., "Simpang Lima, Semarang" -> "Simpang Lima")
+        const parts = p.location.split(',')
+        return parts[0].trim()
+      })
+  )).slice(0, 8) // Limit to 8 locations
 
   return (
     <div className="min-h-screen bg-white">
@@ -271,9 +282,9 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
         {/* Explore More */}
         <div className="mt-16 pt-12 border-t border-[#E5E7EB]">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-6">Telusuri pilihan lainnya di Semarang dan sekitarnya</h2>
+          <h2 className="text-2xl font-semibold text-slate-900 mb-6">Telusuri pilihan lainnya di Jawa Tengah</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {['Semarang', 'Bandungan', 'Ungaran', 'Ambarawa', 'Bawen', 'Kota Lama', 'Simpang Lima', 'Pandanaran'].map((loc) => (
+            {allLocations.map((loc) => (
               <button
                 key={loc}
                 onClick={() => router.push('/public')}

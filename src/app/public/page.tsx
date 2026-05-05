@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp, Globe } from 'lucide-react'
+import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp, Globe, Heart, User } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
+import { useUserStore } from '@/store/useUserStore'
 import { Property, PropertyType } from '@/lib/supabase'
 import { formatCurrency, calculateROI, cn } from '@/lib/utils'
 import { t, Language } from '@/lib/translations'
+import AuthModal from '@/components/AuthModal'
 
 const typeConfig = {
   kost: { label: 'Kost', icon: Home, gradient: 'from-blue-400 to-blue-600' },
@@ -18,12 +20,16 @@ const typeConfig = {
 type ViewMode = 'rent' | 'invest'
 
 export default function PublicPage() {
-  const { properties } = usePropertyStore()
+  const { properties, favorites } = usePropertyStore()
+  const { isAuthenticated, currentUser } = useUserStore()
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<PropertyType | 'all'>('all')
   const [viewMode, setViewMode] = useState<ViewMode>('rent')
   const [lang, setLang] = useState<Language>('id')
+  const [showFavorites, setShowFavorites] = useState(false)
+  const [activeTab, setActiveTab] = useState<'home' | 'search' | 'favorites' | 'account'>('home')
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   const availableProperties = properties.filter((p) => p.status === 'available')
   const filtered = availableProperties.filter((p) => {
@@ -31,6 +37,29 @@ export default function PublicPage() {
     const matchType = filter === 'all' || p.type === filter
     return matchSearch && matchType
   })
+
+  // Filter favorites
+  const favoriteProperties = showFavorites 
+    ? properties.filter((p) => favorites.includes(p.id))
+    : filtered
+
+  const displayProperties = showFavorites ? favoriteProperties : filtered
+
+  const handleTabChange = (tab: 'home' | 'search' | 'favorites' | 'account') => {
+    setActiveTab(tab)
+    if (tab === 'home') {
+      setShowFavorites(false)
+    } else if (tab === 'favorites') {
+      setShowFavorites(true)
+      setActiveTab('favorites')
+    } else if (tab === 'account') {
+      if (isAuthenticated) {
+        router.push('/public/profile')
+      } else {
+        setShowAuthModal(true)
+      }
+    }
+  }
 
   const filterOptions = [
     { label: t('all', lang), value: 'all' as const },
@@ -54,29 +83,59 @@ export default function PublicPage() {
               <span className="text-base sm:text-lg font-bold text-slate-800">PropStay</span>
             </div>
 
-            {/* Center - Mode Toggle */}
-            <div className="flex items-center gap-1.5 bg-slate-100 rounded-full p-1">
+            {/* Center - Mode Toggle & Favorites */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 bg-slate-100 rounded-full p-1">
+                <button
+                  onClick={() => {
+                    setViewMode('rent')
+                    setShowFavorites(false)
+                  }}
+                  className={cn(
+                    'px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
+                    viewMode === 'rent' && !showFavorites
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600'
+                  )}
+                >
+                  {t('rent', lang)}
+                </button>
+                <button
+                  onClick={() => {
+                    setViewMode('invest')
+                    setShowFavorites(false)
+                  }}
+                  className={cn(
+                    'px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
+                    viewMode === 'invest' && !showFavorites
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600'
+                  )}
+                >
+                  {t('invest', lang)}
+                </button>
+              </div>
+
+              {/* Favorites Button */}
               <button
-                onClick={() => setViewMode('rent')}
+                onClick={() => {
+                  setShowFavorites(!showFavorites)
+                  setActiveTab(showFavorites ? 'home' : 'favorites')
+                }}
                 className={cn(
-                  'px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
-                  viewMode === 'rent'
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600'
+                  'relative hidden sm:flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
+                  (showFavorites || activeTab === 'favorites')
+                    ? 'bg-red-50 text-red-600 border border-red-200'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 )}
               >
-                {t('rent', lang)}
-              </button>
-              <button
-                onClick={() => setViewMode('invest')}
-                className={cn(
-                  'px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all',
-                  viewMode === 'invest'
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600'
+                <Heart className={cn('w-3.5 h-3.5 sm:w-4 sm:h-4', (showFavorites || activeTab === 'favorites') && 'fill-red-600')} />
+                <span className="hidden sm:inline">{lang === 'id' ? 'Favorit' : 'Favorites'}</span>
+                {favorites.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full flex items-center justify-center">
+                    {favorites.length}
+                  </span>
                 )}
-              >
-                {t('invest', lang)}
               </button>
             </div>
 
@@ -93,74 +152,110 @@ export default function PublicPage() {
       </nav>
 
       {/* Hero Section - Mobile Optimized */}
-      <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-b border-[#E5E7EB]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 text-center">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 leading-tight">
-            {viewMode === 'rent' ? t('heroTitleRent', lang) : t('heroTitleInvest', lang)}
-          </h1>
-          <p className="text-sm sm:text-lg text-slate-600 mb-6 sm:mb-10 max-w-2xl mx-auto px-4">
-            {viewMode === 'rent' ? t('heroSubtitleRent', lang) : t('heroSubtitleInvest', lang)}
-          </p>
+      {!showFavorites && (
+        <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-b border-[#E5E7EB]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-16 text-center">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 leading-tight">
+              {viewMode === 'rent' ? t('heroTitleRent', lang) : t('heroTitleInvest', lang)}
+            </h1>
+            <p className="text-sm sm:text-lg text-slate-600 mb-6 sm:mb-10 max-w-2xl mx-auto px-4">
+              {viewMode === 'rent' ? t('heroSubtitleRent', lang) : t('heroSubtitleInvest', lang)}
+            </p>
 
-          {/* Search bar - Mobile Optimized */}
-          <div className="relative max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl sm:rounded-full shadow-xl border border-[#E5E7EB] flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-0 p-4 sm:px-6 sm:py-4">
-              <div className="flex items-center flex-1">
-                <Search className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
-                <input
-                  type="text"
-                  placeholder={t('searchPlaceholder', lang)}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 text-slate-700 placeholder-slate-400 focus:outline-none text-sm sm:text-base"
-                />
+            {/* Search bar - Mobile Optimized */}
+            <div className="relative max-w-2xl mx-auto">
+              <div className="bg-white rounded-2xl sm:rounded-full shadow-xl border border-[#E5E7EB] flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-0 p-4 sm:px-6 sm:py-4">
+                <div className="flex items-center flex-1">
+                  <Search className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
+                  <input
+                    type="text"
+                    placeholder={t('searchPlaceholder', lang)}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="flex-1 text-slate-700 placeholder-slate-400 focus:outline-none text-sm sm:text-base"
+                  />
+                </div>
+                <button className="w-full sm:w-auto sm:ml-3 px-6 py-2.5 sm:py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl sm:rounded-full hover:shadow-lg transition">
+                  {t('searchButton', lang)}
+                </button>
               </div>
-              <button className="w-full sm:w-auto sm:ml-3 px-6 py-2.5 sm:py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl sm:rounded-full hover:shadow-lg transition">
-                {t('searchButton', lang)}
-              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Filter & Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        {/* Filter tabs - Horizontal Scroll on Mobile */}
-        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 mb-6 sm:mb-8">
-          <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0 sm:flex-wrap pb-2 sm:pb-0">
-            {filterOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setFilter(opt.value)}
-                className={cn(
-                  'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all border whitespace-nowrap',
-                  filter === opt.value
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                    : 'bg-white border-[#E5E7EB] text-slate-600'
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 pb-24 sm:pb-10">
+        {/* Page Title for Favorites */}
+        {showFavorites && (
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+              {lang === 'id' ? '❤️ Properti Favorit Saya' : '❤️ My Favorite Properties'}
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600">
+              {lang === 'id' 
+                ? `Anda memiliki ${favorites.length} properti favorit` 
+                : `You have ${favorites.length} favorite properties`}
+            </p>
           </div>
-        </div>
+        )}
+
+        {/* Filter tabs - Only show when not in favorites view */}
+        {!showFavorites && (
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 mb-6 sm:mb-8">
+            <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0 sm:flex-wrap pb-2 sm:pb-0">
+              {filterOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setFilter(opt.value)}
+                  className={cn(
+                    'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all border whitespace-nowrap',
+                    filter === opt.value
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                      : 'bg-white border-[#E5E7EB] text-slate-600'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
-        <div className="mb-4 sm:mb-6">
-          <p className="text-xs sm:text-sm text-slate-500">
-            <span className="font-semibold text-slate-900">{filtered.length}</span> {t('propertiesAvailable', lang)}
-          </p>
-        </div>
+        {!showFavorites && (
+          <div className="mb-4 sm:mb-6">
+            <p className="text-xs sm:text-sm text-slate-500">
+              <span className="font-semibold text-slate-900">{displayProperties.length}</span> {t('propertiesAvailable', lang)}
+            </p>
+          </div>
+        )}
 
         {/* Grid - Responsive */}
-        {filtered.length === 0 ? (
+        {displayProperties.length === 0 ? (
           <div className="text-center py-16 sm:py-20 text-slate-400">
-            <Home className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-30" />
-            <p className="text-sm">No properties found.</p>
+            {showFavorites ? (
+              <>
+                <Heart className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-30" />
+                <p className="text-sm sm:text-base mb-2">
+                  {lang === 'id' ? 'Belum ada properti favorit' : 'No favorite properties yet'}
+                </p>
+                <p className="text-xs sm:text-sm">
+                  {lang === 'id' 
+                    ? 'Klik ikon ❤️ pada properti untuk menambahkan ke favorit' 
+                    : 'Click the ❤️ icon on properties to add to favorites'}
+                </p>
+              </>
+            ) : (
+              <>
+                <Home className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-30" />
+                <p className="text-sm">No properties found.</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-            {filtered.map((property) => (
+            {displayProperties.map((property) => (
               <PropertyCard
                 key={property.id}
                 property={property}
@@ -215,6 +310,61 @@ export default function PublicPage() {
           </div>
         </div>
       </footer>
+
+      {/* Bottom Navigation - Mobile Only */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] shadow-lg sm:hidden z-50">
+        <div className="grid grid-cols-3 h-16">
+          {/* Search/Home */}
+          <button
+            onClick={() => handleTabChange('home')}
+            className={cn(
+              'flex flex-col items-center justify-center gap-1 transition-colors',
+              activeTab === 'home' ? 'text-red-600' : 'text-slate-400'
+            )}
+          >
+            <Search className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{lang === 'id' ? 'Telusuri' : 'Search'}</span>
+          </button>
+
+          {/* Favorites */}
+          <button
+            onClick={() => handleTabChange('favorites')}
+            className={cn(
+              'relative flex flex-col items-center justify-center gap-1 transition-colors',
+              activeTab === 'favorites' ? 'text-red-600' : 'text-slate-400'
+            )}
+          >
+            <Heart className={cn('w-5 h-5', activeTab === 'favorites' && 'fill-red-600')} />
+            <span className="text-[10px] font-medium">{lang === 'id' ? 'Favorit' : 'Favorites'}</span>
+            {favorites.length > 0 && (
+              <span className="absolute top-1 right-6 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
+          </button>
+
+          {/* Account */}
+          <button
+            onClick={() => handleTabChange('account')}
+            className={cn(
+              'flex flex-col items-center justify-center gap-1 transition-colors',
+              activeTab === 'account' ? 'text-red-600' : 'text-slate-400'
+            )}
+          >
+            <User className="w-5 h-5" />
+            <span className="text-[10px] font-medium">
+              {isAuthenticated 
+                ? currentUser?.name.split(' ')[0] 
+                : lang === 'id' ? 'Masuk' : 'Login'}
+            </span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} lang={lang} />
+      )}
     </div>
   )
 }

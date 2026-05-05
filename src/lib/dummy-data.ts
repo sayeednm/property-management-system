@@ -42,7 +42,7 @@ export const dummyProperties: Property[] = [
     price_monthly: 2800000,
     price_daily: 220000,
     assets_value: 700000000,
-    status: 'occupied',
+    status: 'available',
     images: [],
   },
   {
@@ -97,7 +97,7 @@ export const dummyProperties: Property[] = [
     price_monthly: 1800000,
     price_daily: 120000,
     assets_value: 500000000,
-    status: 'occupied',
+    status: 'available',
     images: [],
   },
   {

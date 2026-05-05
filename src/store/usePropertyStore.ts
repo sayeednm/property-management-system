@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Property, PropertyType } from '@/lib/supabase'
 import { dummyProperties } from '@/lib/dummy-data'
+import { dummyBookings } from '@/lib/dummy-bookings'
 
 export type CustomerType = 'rent' | 'buyer'
 export type BookingStatus = 'pending' | 'approved' | 'rejected'
@@ -11,8 +12,10 @@ export type BookingStatus = 'pending' | 'approved' | 'rejected'
 export interface Booking {
   id: string
   propertyId: string
+  userId?: string // Optional: for registered users
   customerName: string
-  customerEmail?: string
+  customerEmail: string
+  customerPhone?: string
   customerType: CustomerType
   checkIn: string
   duration: number
@@ -45,8 +48,8 @@ export const usePropertyStore = create<PropertyStore>()(
       searchQuery: '',
       filterType: 'all',
       properties: dummyProperties,
-      bookings: [],
-      favorites: [],
+      bookings: dummyBookings,
+      favorites: [], // Kosong biar boss bisa coba sendiri
       setSearchQuery: (query) => set({ searchQuery: query }),
       setFilterType: (type) => set({ filterType: type }),
       setProperties: (properties) => set({ properties }),
@@ -101,7 +104,7 @@ export const usePropertyStore = create<PropertyStore>()(
     }),
     {
       name: 'pms-storage',
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         properties: state.properties,
         bookings: state.bookings,
@@ -109,11 +112,11 @@ export const usePropertyStore = create<PropertyStore>()(
       }),
       migrate: (persistedState: any, version: number) => {
         // If old version, reset to default
-        if (version < 2) {
+        if (version < 3) {
           return {
             properties: dummyProperties,
-            bookings: [],
-            favorites: [],
+            bookings: dummyBookings,
+            favorites: [], // Kosong untuk demo
           }
         }
         return persistedState as any

@@ -73,62 +73,64 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Kembali</span>
-          </button>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Home className="w-4 h-4 text-white" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-1.5 sm:gap-2 text-slate-600 hover:text-slate-900 transition"
+            >
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-base font-medium">Kembali</span>
+            </button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Home className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+              </div>
+              <span className="text-base sm:text-lg font-bold text-slate-800 hidden sm:inline">PropStay</span>
+              {/* Mode Indicator */}
+              <span className={cn(
+                'px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold whitespace-nowrap',
+                viewMode === 'invest' 
+                  ? 'bg-emerald-100 text-emerald-700' 
+                  : 'bg-indigo-100 text-indigo-700'
+              )}>
+                {viewMode === 'invest' ? 'INVEST' : 'RENT'}
+              </span>
             </div>
-            <span className="text-lg font-bold text-slate-800">PropStay</span>
-            {/* Mode Indicator */}
-            <span className={cn(
-              'ml-2 px-3 py-1 rounded-full text-xs font-bold',
-              viewMode === 'invest' 
-                ? 'bg-emerald-100 text-emerald-700' 
-                : 'bg-indigo-100 text-indigo-700'
-            )}>
-              {viewMode === 'invest' ? 'INVEST MODE' : 'RENT MODE'}
-            </span>
           </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <button onClick={() => router.push('/public')} className="hover:text-slate-900">PropStay</button>
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-500 mb-4 sm:mb-6 overflow-x-auto">
+          <button onClick={() => router.push('/public')} className="hover:text-slate-900 whitespace-nowrap">PropStay</button>
           <span>›</span>
-          <span>Jawa Tengah</span>
+          <span className="whitespace-nowrap">Jawa Tengah</span>
           <span>›</span>
-          <span>Semarang</span>
-          <span>›</span>
-          <span className="text-slate-900">{property.name}</span>
+          <span className="whitespace-nowrap">Semarang</span>
+          <span className="hidden sm:inline">›</span>
+          <span className="text-slate-900 truncate hidden sm:inline">{property.name}</span>
         </div>
 
         {/* Title & Rating */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">{property.name}</h1>
-          <div className="flex items-center gap-4 text-sm">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2 leading-tight">{property.name}</h1>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm">
             <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />
               <span className="font-semibold">4.9</span>
               <span className="text-slate-400">(127 ulasan)</span>
             </div>
             <div className="flex items-center gap-1 text-slate-600">
-              <MapPin className="w-4 h-4" />
+              <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>{property.location}</span>
             </div>
           </div>
         </div>
 
         {/* Photo Gallery */}
-        <div className="grid grid-cols-4 gap-2 rounded-2xl overflow-hidden mb-8 h-96">
+        <div className="grid grid-cols-4 gap-2 rounded-2xl overflow-hidden mb-6 sm:mb-8 h-64 sm:h-80 md:h-96">
           <div className={cn('col-span-2 row-span-2 bg-gradient-to-br', typeConfig[property.type].gradient)} />
           <div className={cn('bg-gradient-to-br opacity-80', typeConfig[property.type].gradient)} />
           <div className={cn('bg-gradient-to-br opacity-70', typeConfig[property.type].gradient)} />
@@ -136,29 +138,29 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
           <div className={cn('bg-gradient-to-br opacity-50', typeConfig[property.type].gradient)} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Left Column */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Host Info */}
-            <div className="pb-8 border-b border-[#E5E7EB]">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Dikelola oleh PropStay</h2>
+            <div className="pb-6 sm:pb-8 border-b border-[#E5E7EB]">
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4">Dikelola oleh PropStay</h2>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <Home className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <Home className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">PropStay Management</p>
-                  <p className="text-sm text-slate-400">Verified Host · 5 tahun pengalaman</p>
+                  <p className="font-semibold text-slate-800 text-sm sm:text-base">PropStay Management</p>
+                  <p className="text-xs sm:text-sm text-slate-400">Verified Host · 5 tahun pengalaman</p>
                 </div>
               </div>
             </div>
 
             {/* Description */}
-            <div className="pb-8 border-b border-[#E5E7EB]">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">
+            <div className="pb-6 sm:pb-8 border-b border-[#E5E7EB]">
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4">
                 {viewMode === 'invest' ? 'Tentang investasi ini' : 'Tentang properti ini'}
               </h2>
-              <p className="text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 {viewMode === 'invest' ? (
                   <>
                     {property.name} adalah investasi properti yang menawarkan ROI {roi.toFixed(2)}% per tahun dengan nilai aset Rp {formatCurrency(property.assets_value)}. 
@@ -222,13 +224,13 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
             {/* Amenities - Only show for rent mode */}
             {viewMode === 'rent' && (
-              <div className="pb-8 border-b border-[#E5E7EB]">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">Fasilitas</h2>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="pb-6 sm:pb-8 border-b border-[#E5E7EB]">
+                <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-3 sm:mb-4">Fasilitas</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {amenitiesIcons.map(({ icon: Icon, label }, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <Icon className="w-5 h-5 text-slate-400" />
-                      <span className="text-slate-700">{label}</span>
+                    <div key={i} className="flex items-center gap-2 sm:gap-3">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+                      <span className="text-sm sm:text-base text-slate-700">{label}</span>
                     </div>
                   ))}
                 </div>
@@ -236,21 +238,21 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             )}
 
             {/* Reviews */}
-            <div className="pb-8 border-b border-[#E5E7EB]">
-              <div className="flex items-center gap-2 mb-6">
-                <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-                <h2 className="text-xl font-semibold text-slate-900">4.9 · 127 ulasan</h2>
+            <div className="pb-6 sm:pb-8 border-b border-[#E5E7EB]">
+              <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400 text-amber-400" />
+                <h2 className="text-lg sm:text-xl font-semibold text-slate-900">4.9 · 127 ulasan</h2>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex gap-4">
-                    <div className="w-10 h-10 bg-slate-200 rounded-full flex-shrink-0" />
+                  <div key={i} className="flex gap-3 sm:gap-4">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-200 rounded-full flex-shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="font-semibold text-slate-800">User {i}</p>
+                        <p className="text-sm sm:text-base font-semibold text-slate-800">User {i}</p>
                         <span className="text-xs text-slate-400">· 2 minggu lalu</span>
                       </div>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-xs sm:text-sm text-slate-600">
                         Properti sangat bagus dan nyaman. Lokasi strategis, fasilitas lengkap. Highly recommended!
                       </p>
                     </div>
@@ -387,14 +389,14 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
           {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-lg">
-              <div className="mb-6">
+            <div className="lg:sticky lg:top-24 bg-white border border-[#E5E7EB] rounded-2xl p-4 sm:p-6 shadow-lg">
+              <div className="mb-4 sm:mb-6">
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-2xl font-bold text-slate-900">{formatCurrency(property.price_monthly)}</span>
-                  <span className="text-slate-500">/bulan</span>
+                  <span className="text-xl sm:text-2xl font-bold text-slate-900">{formatCurrency(property.price_monthly)}</span>
+                  <span className="text-sm sm:text-base text-slate-500">/bulan</span>
                 </div>
-                <div className="flex items-center gap-1 text-sm">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <div className="flex items-center gap-1 text-xs sm:text-sm">
+                  <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400" />
                   <span className="font-semibold">4.9</span>
                   <span className="text-slate-400">· 127 ulasan</span>
                 </div>
@@ -402,20 +404,28 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
               <button
                 onClick={() => setShowBooking(true)}
-                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition mb-4"
+                className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm sm:text-base font-semibold rounded-xl hover:shadow-lg transition mb-3 sm:mb-4"
               >
                 {viewMode === 'invest' ? 'Ajukan Penawaran' : 'Booking Sekarang'}
               </button>
 
-              <p className="text-xs text-center text-slate-400 mb-6">
+              <p className="text-[10px] sm:text-xs text-center text-slate-400 mb-4 sm:mb-6">
                 {viewMode === 'invest' 
                   ? 'Tim kami akan menghubungi Anda untuk diskusi lebih lanjut' 
                   : 'Anda tidak akan dikenakan biaya'}
               </p>
 
-              <div className="space-y-3 pt-6 border-t border-[#E5E7EB]">
-                <div className="flex items-center gap-3 text-sm">
-                  <Shield className="w-5 h-5 text-slate-400" />
+              <div className="space-y-2 sm:space-y-3 pt-4 sm:pt-6 border-t border-[#E5E7EB]">
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+                  <span className="text-slate-600">Pembayaran aman</span>
+                </div>
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
+                  <span className="text-slate-600">Fleksibel check-in</span>
+                </div>
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+                  <Award className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
                   <span className="text-slate-600">Pembayaran aman</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">

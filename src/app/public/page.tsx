@@ -139,14 +139,37 @@ export default function PublicPage() {
               </button>
             </div>
 
-            {/* Right - Language Toggle */}
-            <button
-              onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-100 rounded-full text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{lang.toUpperCase()}</span>
-            </button>
+            {/* Right - Language Toggle & Account */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-100 rounded-full text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{lang.toUpperCase()}</span>
+              </button>
+
+              {/* Account Button - Desktop Only */}
+              <button
+                onClick={() => {
+                  if (isAuthenticated) {
+                    router.push('/public/profile')
+                  } else {
+                    setShowAuthModal(true)
+                  }
+                }}
+                className="hidden sm:flex items-center gap-2 px-4 py-1.5 bg-slate-100 rounded-full text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+              >
+                <User className="w-4 h-4" />
+                <span>
+                  {isAuthenticated && currentUser
+                    ? currentUser.name.split(' ')[0]
+                    : lang === 'id'
+                    ? 'Masuk'
+                    : 'Login'}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </nav>

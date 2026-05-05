@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Search, MapPin, Home, Building2, TreePine, House, Star, TrendingUp } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
 import { Property, PropertyType } from '@/lib/supabase'
@@ -26,9 +27,9 @@ type ViewMode = 'rent' | 'invest'
 
 export default function PublicPage() {
   const { properties } = usePropertyStore()
+  const router = useRouter()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<PropertyType | 'all'>('all')
-  const [selected, setSelected] = useState<Property | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('rent')
 
   const availableProperties = properties.filter((p) => p.status === 'available')
@@ -161,7 +162,7 @@ export default function PublicPage() {
                 key={property.id}
                 property={property}
                 viewMode={viewMode}
-                onClick={() => setSelected(property)}
+                onClick={() => router.push(`/public/${property.id}`)}
               />
             ))}
           </div>
@@ -210,14 +211,6 @@ export default function PublicPage() {
           </div>
         </div>
       </footer>
-
-      {/* Booking Modal */}
-      {selected && (
-        <PublicBookingModal
-          property={selected}
-          onClose={() => setSelected(null)}
-        />
-      )}
     </div>
   )
 }

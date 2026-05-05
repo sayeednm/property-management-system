@@ -1,7 +1,7 @@
 'use client'
 
-import { use, useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { use, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Star, MapPin, Wifi, Car, Coffee, Tv, Wind, Users, Home, Calendar, Shield, Award } from 'lucide-react'
 import { usePropertyStore } from '@/store/usePropertyStore'
 import { formatCurrency, calculateROI, cn } from '@/lib/utils'
@@ -26,19 +26,12 @@ const typeConfig = {
 export default function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { properties } = usePropertyStore()
   const [showBooking, setShowBooking] = useState(false)
-  const [viewMode, setViewMode] = useState<'rent' | 'invest'>('rent')
   
-  // Get viewMode from URL query on mount and when URL changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const searchParams = new URLSearchParams(window.location.search)
-      const mode = (searchParams.get('mode') as 'rent' | 'invest') || 'rent'
-      setViewMode(mode)
-      console.log('🔍 Mode detected:', mode) // Debug log
-    }
-  }, [])
+  // Get viewMode from URL query params
+  const viewMode = (searchParams.get('mode') as 'rent' | 'invest') || 'rent'
 
   const property = properties.find((p) => p.id === id)
 

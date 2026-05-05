@@ -2,91 +2,84 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, User as UserIcon, Mail, Phone, Calendar, Heart, ClipboardList, LogOut, Home } from 'lucide-react'
+import { ArrowLeft, User as UserIcon, Mail, Phone, Calendar, Heart, ClipboardList, LogOut, Home, Sun, Moon } from 'lucide-react'
 import { useUserStore } from '@/store/useUserStore'
 import { usePropertyStore } from '@/store/usePropertyStore'
+import { useThemeStore } from '@/store/useThemeStore'
+import { cn } from '@/lib/utils'
 
 export default function ProfilePage() {
   const router = useRouter()
   const { currentUser, isAuthenticated, logout, updateProfile } = useUserStore()
   const { bookings, favorites } = usePropertyStore()
+  const { darkMode: d, toggleDarkMode } = useThemeStore()
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/public')
-      return
-    }
-    if (currentUser) {
-      setName(currentUser.name)
-      setEmail(currentUser.email)
-      setPhone(currentUser.phone || '')
-    }
+    if (!isAuthenticated) { router.push('/public'); return }
+    if (currentUser) { setName(currentUser.name); setEmail(currentUser.email); setPhone(currentUser.phone || '') }
   }, [isAuthenticated, currentUser, router])
 
   if (!currentUser) return null
 
   const userBookings = bookings.filter((b) => b.customerEmail === currentUser.email)
   const activeBookings = userBookings.filter((b) => b.status === 'approved').length
+  const initials = currentUser.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
 
   const handleSave = () => {
-    if (currentUser) {
-      updateProfile(currentUser.id, { name, email, phone })
-      setIsEditing(false)
-    }
+    if (currentUser) { updateProfile(currentUser.id, { name, email, phone }); setIsEditing(false) }
   }
 
-  const handleLogout = () => {
-    logout()
-    router.push('/public')
-  }
+  const handleLogout = () => { logout(); router.push('/public') }
 
-  // Get initials for avatar
-  const initials = currentUser.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
+  const card = cn('rounded-2xl border p-6 mb-6', d ? 'bg-[#001117] border-[#E6A854]/20' : 'bg-white border-[#E5E7EB] shadow-sm')
+  const text = d ? 'text-white' : 'text-slate-900'
+  const subtext = d ? 'text-slate-400' : 'text-slate-500'
+  const inputCls = cn(
+    'w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition',
+    d ? 'bg-[#001117]/50 border-[#E6A854]/30 text-white placeholder-slate-500 focus:ring-[#E6A854]/50 focus:border-[#E6A854] disabled:opacity-50'
+      : 'border-[#E5E7EB] focus:ring-[#E6A854]/30 focus:border-[#E6A854] disabled:bg-slate-50 disabled:text-slate-600'
+  )
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className={d ? 'min-h-screen bg-[#001117]' : 'min-h-screen bg-[#F9FAFB]'}>
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm">
+      <header className={cn('sticky top-0 z-40 border-b shadow-sm', d ? 'bg-[#001117]/95 backdrop-blur-sm border-[#E6A854]/20' : 'bg-white border-[#E5E7EB]')}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition"
-          >
+          <button onClick={() => router.back()} className={cn('flex items-center gap-2 transition', d ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')}>
             <ArrowLeft className="w-5 h-5" />
             <span className="font-medium">Kembali</span>
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Home className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-bold text-slate-800">StayVest</span>
+            <button onClick={toggleDarkMode} className={cn('p-1.5 rounded-lg transition', d ? 'bg-[#E6A854]/10 text-[#E6A854] hover:bg-[#E6A854]/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200')}>
+              {d ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button onClick={() => router.push('/landing')} className="flex items-center gap-2">
+              <div className={d ? 'w-8 h-8 bg-gradient-to-br from-[#E6A854] to-[#D4AF37] rounded-lg flex items-center justify-center' : 'w-8 h-8 bg-gradient-to-br from-[#D4AF37] to-[#E6A854] rounded-lg flex items-center justify-center'}>
+                <Home className="w-4 h-4 text-[#001117]" />
+              </div>
+              <span className={cn('text-lg font-bold', d ? 'text-white' : 'text-slate-800')}>
+                STAY<span className="text-[#E6A854]">VEST</span>
+              </span>
+            </button>
           </div>
         </div>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 pb-24 sm:pb-8">
         {/* Profile Header */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] p-6 mb-6">
+        <div className={card}>
           <div className="flex items-start gap-4">
-            {/* Avatar */}
-            <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-bold text-white">{initials}</span>
+            <div className={d ? 'w-20 h-20 bg-gradient-to-br from-[#E6A854] to-[#D4AF37] rounded-full flex items-center justify-center flex-shrink-0' : 'w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#E6A854] rounded-full flex items-center justify-center flex-shrink-0'}>
+              <span className="text-2xl font-bold text-[#001117]">{initials}</span>
             </div>
-
-            {/* Info */}
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-slate-900 mb-1">{currentUser.name}</h1>
-              <p className="text-sm text-slate-500 mb-3">{currentUser.email}</p>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
+              <h1 className={cn('text-2xl font-bold mb-1', text)}>{currentUser.name}</h1>
+              <p className={cn('text-sm mb-3', subtext)}>{currentUser.email}</p>
+              <div className={cn('flex items-center gap-2 text-xs', subtext)}>
                 <Calendar className="w-4 h-4" />
                 <span>Bergabung {new Date(currentUser.joinedAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long' })}</span>
               </div>
@@ -94,135 +87,74 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-4 text-center">
-            <ClipboardList className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">{userBookings.length}</p>
-            <p className="text-xs text-slate-500">Total Booking</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-4 text-center">
-            <ClipboardList className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">{activeBookings}</p>
-            <p className="text-xs text-slate-500">Aktif</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-[#E5E7EB] p-4 text-center">
-            <Heart className="w-6 h-6 text-red-600 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-slate-900">{favorites.length}</p>
-            <p className="text-xs text-slate-500">Favorit</p>
-          </div>
+          {[
+            { icon: ClipboardList, value: userBookings.length, label: 'Total Booking', color: d ? 'text-[#E6A854]' : 'text-[#D4AF37]' },
+            { icon: ClipboardList, value: activeBookings, label: 'Aktif', color: 'text-emerald-500' },
+            { icon: Heart, value: favorites.length, label: 'Favorit', color: 'text-red-500' },
+          ].map(({ icon: Icon, value, label, color }) => (
+            <div key={label} className={cn('rounded-xl border p-4 text-center', d ? 'bg-[#001117] border-[#E6A854]/20' : 'bg-white border-[#E5E7EB] shadow-sm')}>
+              <Icon className={cn('w-6 h-6 mx-auto mb-2', color)} />
+              <p className={cn('text-2xl font-bold', text)}>{value}</p>
+              <p className={cn('text-xs', subtext)}>{label}</p>
+            </div>
+          ))}
         </div>
 
         {/* Profile Form */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] p-6 mb-6">
+        <div className={card}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-slate-900">Informasi Profil</h2>
+            <h2 className={cn('text-lg font-semibold', text)}>Informasi Profil</h2>
             {!isEditing ? (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700"
-              >
-                Edit
-              </button>
+              <button onClick={() => setIsEditing(true)} className={d ? 'text-sm font-semibold text-[#E6A854] hover:text-[#D4AF37]' : 'text-sm font-semibold text-[#D4AF37] hover:text-[#E6A854]'}>Edit</button>
             ) : (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setIsEditing(false)
-                    setName(currentUser.name)
-                    setEmail(currentUser.email)
-                    setPhone(currentUser.phone || '')
-                  }}
-                  className="text-sm font-semibold text-slate-600 hover:text-slate-700"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-700"
-                >
-                  Simpan
-                </button>
+              <div className="flex gap-3">
+                <button onClick={() => { setIsEditing(false); setName(currentUser.name); setEmail(currentUser.email); setPhone(currentUser.phone || '') }}
+                  className={cn('text-sm font-semibold', subtext)}>Batal</button>
+                <button onClick={handleSave} className={d ? 'text-sm font-semibold text-[#E6A854]' : 'text-sm font-semibold text-[#D4AF37]'}>Simpan</button>
               </div>
             )}
           </div>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Nama Lengkap</label>
-              <div className="relative">
-                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-3 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50 disabled:text-slate-600"
-                />
+            {[
+              { label: 'Nama Lengkap', icon: UserIcon, value: name, onChange: setName, type: 'text', placeholder: 'Masukkan nama lengkap' },
+              { label: 'Email', icon: Mail, value: email, onChange: setEmail, type: 'email', placeholder: 'Masukkan email' },
+              { label: 'Nomor Telepon', icon: Phone, value: phone, onChange: setPhone, type: 'tel', placeholder: 'Masukkan nomor telepon' },
+            ].map(({ label, icon: Icon, value, onChange, type, placeholder }) => (
+              <div key={label}>
+                <label className={cn('block text-sm font-medium mb-2', d ? 'text-slate-300' : 'text-slate-700')}>{label}</label>
+                <div className="relative">
+                  <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
+                    disabled={!isEditing} placeholder={placeholder} className={inputCls} />
+                </div>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-3 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50 disabled:text-slate-600"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Nomor Telepon</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  disabled={!isEditing}
-                  placeholder="Masukkan nomor telepon"
-                  className="w-full pl-10 pr-4 py-3 border border-[#E5E7EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-50 disabled:text-slate-600"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
         {/* Menu Items */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#E5E7EB] mb-6 overflow-hidden">
-          <button
-            onClick={() => router.push('/public/my-bookings')}
-            className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition border-b border-[#E5E7EB]"
-          >
-            <div className="flex items-center gap-3">
-              <ClipboardList className="w-5 h-5 text-slate-600" />
-              <span className="font-medium text-slate-900">Booking Saya</span>
-            </div>
-            <span className="text-slate-400">→</span>
-          </button>
-
-          <button
-            onClick={() => router.push('/public?favorites=true')}
-            className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition"
-          >
-            <div className="flex items-center gap-3">
-              <Heart className="w-5 h-5 text-slate-600" />
-              <span className="font-medium text-slate-900">Favorit Saya</span>
-            </div>
-            <span className="text-slate-400">→</span>
-          </button>
+        <div className={cn('rounded-2xl border mb-6 overflow-hidden', d ? 'bg-[#001117] border-[#E6A854]/20' : 'bg-white border-[#E5E7EB] shadow-sm')}>
+          {[
+            { label: 'Booking Saya', icon: ClipboardList, onClick: () => router.push('/public/my-bookings'), border: true },
+            { label: 'Favorit Saya', icon: Heart, onClick: () => router.push('/public'), border: false },
+          ].map(({ label, icon: Icon, onClick, border }) => (
+            <button key={label} onClick={onClick}
+              className={cn('w-full flex items-center justify-between p-4 transition', border ? (d ? 'border-b border-[#E6A854]/20' : 'border-b border-[#E5E7EB]') : '', d ? 'hover:bg-[#E6A854]/10' : 'hover:bg-slate-50')}>
+              <div className="flex items-center gap-3">
+                <Icon className={d ? 'w-5 h-5 text-[#E6A854]' : 'w-5 h-5 text-slate-600'} />
+                <span className={cn('font-medium', text)}>{label}</span>
+              </div>
+              <span className={subtext}>→</span>
+            </button>
+          ))}
         </div>
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-600 font-semibold rounded-xl hover:bg-red-100 transition"
-        >
+        {/* Logout */}
+        <button onClick={handleLogout}
+          className={cn('w-full flex items-center justify-center gap-2 py-3 font-semibold rounded-xl transition', d ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20' : 'bg-red-50 text-red-600 hover:bg-red-100')}>
           <LogOut className="w-5 h-5" />
           <span>Keluar</span>
         </button>

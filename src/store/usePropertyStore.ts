@@ -25,6 +25,7 @@ interface PropertyStore {
   filterType: PropertyType | 'all'
   properties: Property[]
   bookings: Booking[]
+  favorites: string[] // Array of property IDs
   setSearchQuery: (query: string) => void
   setFilterType: (type: PropertyType | 'all') => void
   setProperties: (properties: Property[]) => void
@@ -34,15 +35,18 @@ interface PropertyStore {
   addBooking: (booking: Omit<Booking, 'id' | 'createdAt' | 'status'>) => void
   approveBooking: (id: string) => void
   rejectBooking: (id: string) => void
+  toggleFavorite: (propertyId: string) => void
+  isFavorite: (propertyId: string) => boolean
 }
 
 export const usePropertyStore = create<PropertyStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       searchQuery: '',
       filterType: 'all',
       properties: dummyProperties,
       bookings: [],
+      favorites: [],
       setSearchQuery: (query) => set({ searchQuery: query }),
       setFilterType: (type) => set({ filterType: type }),
       setProperties: (properties) => set({ properties }),
@@ -84,6 +88,16 @@ export const usePropertyStore = create<PropertyStore>()(
         set((state) => ({
           bookings: state.bookings.map((b) => (b.id === id ? { ...b, status: 'rejected' as BookingStatus } : b)),
         })),
+      toggleFavorite: (propertyId) =>
+        set((state) => {
+          const isFav = state.favorites.includes(propertyId)
+          return {
+            favorites: isFav
+              ? state.favorites.filter((id) => id !== propertyId)
+              : [...state.favorites, propertyId],
+          }
+        }),
+      isFavorite: (propertyId) => get().favorites.includes(propertyId),
     }),
     {
       name: 'pms-storage',
@@ -91,6 +105,7 @@ export const usePropertyStore = create<PropertyStore>()(
       partialize: (state) => ({
         properties: state.properties,
         bookings: state.bookings,
+        favorites: state.favorites,
       }),
       migrate: (persistedState: any, version: number) => {
         // If old version, reset to default
@@ -98,6 +113,7 @@ export const usePropertyStore = create<PropertyStore>()(
           return {
             properties: dummyProperties,
             bookings: [],
+            favorites: [],
           }
         }
         return persistedState as any

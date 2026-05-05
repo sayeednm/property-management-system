@@ -142,23 +142,23 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
             {/* Investment Info (if relevant) */}
             <div className="pb-8 border-b border-[#E5E7EB]">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Informasi Investasi</h2>
-              <div className="bg-emerald-50 rounded-2xl p-6">
-                <div className="grid grid-cols-2 gap-6">
+              <div className="bg-emerald-50 rounded-2xl p-4 sm:p-6">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <p className="text-sm text-emerald-600 mb-1">Nilai Aset</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatCurrency(property.assets_value)}</p>
+                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">Nilai Aset</p>
+                    <p className="text-lg sm:text-2xl font-bold text-slate-900 break-words">{formatCurrency(property.assets_value)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-emerald-600 mb-1">ROI Tahunan</p>
-                    <p className="text-2xl font-bold text-emerald-700">{roi.toFixed(2)}%</p>
+                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">ROI Tahunan</p>
+                    <p className="text-lg sm:text-2xl font-bold text-emerald-700">{roi.toFixed(2)}%</p>
                   </div>
                   <div>
-                    <p className="text-sm text-emerald-600 mb-1">Pendapatan/Bulan</p>
-                    <p className="text-lg font-semibold text-slate-900">{formatCurrency(property.price_monthly)}</p>
+                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">Pendapatan/Bulan</p>
+                    <p className="text-sm sm:text-lg font-semibold text-slate-900 break-words">{formatCurrency(property.price_monthly)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-emerald-600 mb-1">Pendapatan/Tahun</p>
-                    <p className="text-lg font-semibold text-slate-900">{formatCurrency(property.price_monthly * 12)}</p>
+                    <p className="text-xs sm:text-sm text-emerald-600 mb-1">Pendapatan/Tahun</p>
+                    <p className="text-sm sm:text-lg font-semibold text-slate-900 break-words">{formatCurrency(property.price_monthly * 12)}</p>
                   </div>
                 </div>
               </div>

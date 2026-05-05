@@ -17,6 +17,25 @@ const typeConfig = {
 
 type ViewMode = 'rent' | 'invest'
 
+// Helper function to group properties by area
+function getLocationGroups(properties: Property[]) {
+  const groups: { [key: string]: Property[] } = {}
+  
+  properties.forEach((prop) => {
+    // Extract area from location (e.g., "Simpang Lima, Semarang" -> "Semarang")
+    const area = prop.location.split(',').pop()?.trim() || 'Semarang'
+    if (!groups[area]) {
+      groups[area] = []
+    }
+    groups[area].push(prop)
+  })
+  
+  return Object.entries(groups).map(([area, properties]) => ({
+    area,
+    properties,
+  }))
+}
+
 export default function PublicPage() {
   const { properties } = usePropertyStore()
   const router = useRouter()
@@ -124,50 +143,69 @@ export default function PublicPage() {
       </div>
 
       {/* Filter & Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+      <div className="py-6 sm:py-10">
         {/* Filter tabs - Horizontal Scroll on Mobile */}
-        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 mb-6 sm:mb-8">
-          <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0 sm:flex-wrap pb-2 sm:pb-0">
-            {filterOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setFilter(opt.value)}
-                className={cn(
-                  'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all border whitespace-nowrap',
-                  filter === opt.value
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-md'
-                    : 'bg-white border-[#E5E7EB] text-slate-600'
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6 sm:mb-8">
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex gap-2 sm:gap-3 min-w-max sm:min-w-0 sm:flex-wrap pb-2 sm:pb-0">
+              {filterOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setFilter(opt.value)}
+                  className={cn(
+                    'px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all border whitespace-nowrap',
+                    filter === opt.value
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-md'
+                      : 'bg-white border-[#E5E7EB] text-slate-600'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="mb-4 sm:mb-6">
-          <p className="text-xs sm:text-sm text-slate-500">
-            <span className="font-semibold text-slate-900">{filtered.length}</span> {t('propertiesAvailable', lang)}
-          </p>
-        </div>
-
-        {/* Grid - Mobile Optimized */}
+        {/* Properties by Location - Horizontal Scroll */}
         {filtered.length === 0 ? (
           <div className="text-center py-16 sm:py-20 text-slate-400">
             <Home className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-30" />
             <p className="text-sm">No properties found.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-            {filtered.map((property) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                viewMode={viewMode}
-                lang={lang}
-                onClick={() => router.push(`/public/${property.id}?lang=${lang}`)}
-              />
+          <div className="space-y-8 sm:space-y-12">
+            {/* Group properties by location area */}
+            {getLocationGroups(filtered).map((group) => (
+              <div key={group.area}>
+                {/* Section Header */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-4 flex items-center justify-between">
+                  <h2 className="text-lg sm:text-2xl font-bold text-slate-900">
+                    {lang === 'id' ? `Penginapan populer di ${group.area}` : `Popular stays in ${group.area}`}
+                  </h2>
+                  <button className="text-sm font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1">
+                    {lang === 'id' ? 'Lihat semua' : 'See all'}
+                    <span>→</span>
+                  </button>
+                </div>
+
+                {/* Horizontal Scroll Cards */}
+                <div className="overflow-x-auto scrollbar-hide">
+                  <div className="flex gap-4 px-4 sm:px-6 pb-2">
+                    <div className="flex gap-4 sm:gap-5">
+                      {group.properties.map((property) => (
+                        <div key={property.id} className="flex-shrink-0 w-[280px] sm:w-[320px]">
+                          <PropertyCard
+                            property={property}
+                            viewMode={viewMode}
+                            lang={lang}
+                            onClick={() => router.push(`/public/${property.id}?lang=${lang}`)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -223,62 +261,77 @@ function PropertyCard({ property, viewMode, lang, onClick }: { property: Propert
   const type = typeConfig[property.type]
   const TypeIcon = type.icon
   const roi = calculateROI(property.price_monthly, property.assets_value)
+  const { toggleFavorite, isFavorite } = usePropertyStore()
+  const favorite = isFavorite(property.id)
+  
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent card click
+    toggleFavorite(property.id)
+  }
   
   return (
-    <div onClick={onClick} className="group cursor-pointer transform transition-all duration-300 active:scale-95 sm:hover:scale-[1.02]">
+    <div onClick={onClick} className="group cursor-pointer transform transition-all duration-300 active:scale-95">
       {/* Image - Optimized for Mobile */}
-      <div className="relative w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden mb-2 sm:mb-3 shadow-md group-hover:shadow-2xl transition-all duration-300">
+      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-3 shadow-md group-hover:shadow-xl transition-all duration-300">
         <div className={cn('absolute inset-0 bg-gradient-to-br', type.gradient)} />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <TypeIcon className="w-12 h-12 sm:w-20 sm:h-20 text-white/70 group-hover:scale-125 group-hover:text-white/90 transition-all duration-500" />
+          <TypeIcon className="w-16 h-16 sm:w-20 sm:h-20 text-white/70 group-hover:scale-110 group-hover:text-white/90 transition-all duration-500" />
         </div>
-        {/* Badge - Smaller on Mobile */}
-        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/95 backdrop-blur-md px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold text-slate-800 shadow-lg">
+        
+        {/* Favorite Button */}
+        <button 
+          onClick={handleFavoriteClick}
+          className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all shadow-md z-10"
+        >
+          <svg 
+            className={cn(
+              "w-4 h-4 transition-all",
+              favorite ? "fill-red-500 text-red-500" : "fill-none text-slate-700"
+            )} 
+            stroke="currentColor" 
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+        
+        {/* Type Badge */}
+        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 shadow-lg">
           {type.label}
         </div>
-        {/* Rating or ROI badge */}
-        {viewMode === 'rent' ? (
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/95 backdrop-blur-md px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold text-slate-800 shadow-lg flex items-center gap-0.5 sm:gap-1">
-            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
-            4.9
-          </div>
-        ) : (
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-emerald-500 backdrop-blur-md px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold text-white shadow-lg flex items-center gap-0.5 sm:gap-1">
-            <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {roi.toFixed(1)}%
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
 
-      {/* Info - Compact on Mobile */}
-      <div className="px-0.5 sm:px-1">
-        <h3 className="font-bold text-slate-900 text-xs sm:text-base mb-1 sm:mb-1.5 group-hover:text-indigo-600 transition-colors line-clamp-1">
-          {property.name}
-        </h3>
-        
-        <div className="flex items-center gap-1 sm:gap-1.5 mb-2 sm:mb-3">
-          <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 flex-shrink-0" />
-          <span className="text-[10px] sm:text-sm text-slate-500 line-clamp-1 font-medium">{property.location}</span>
+      {/* Info - Compact */}
+      <div className="px-1">
+        <div className="flex items-start justify-between mb-1">
+          <h3 className="font-semibold text-slate-900 text-sm line-clamp-1 flex-1">
+            {property.name}
+          </h3>
+          {viewMode === 'rent' && (
+            <div className="flex items-center gap-1 ml-2">
+              <Star className="w-3.5 h-3.5 fill-slate-900 text-slate-900" />
+              <span className="text-xs font-semibold text-slate-900">4.9</span>
+            </div>
+          )}
         </div>
+        
+        <p className="text-xs text-slate-500 mb-2 line-clamp-1">{property.location}</p>
 
         {viewMode === 'rent' ? (
           <div className="flex items-baseline gap-1">
-            <span className="text-sm sm:text-xl font-bold text-slate-900">{formatCurrency(property.price_monthly)}</span>
-            <span className="text-[10px] sm:text-sm text-slate-500 font-medium">{t('perMonth', lang)}</span>
+            <span className="text-base font-bold text-slate-900">{formatCurrency(property.price_monthly)}</span>
+            <span className="text-xs text-slate-500 font-medium">{t('perMonth', lang)}</span>
           </div>
         ) : (
           <div>
-            <div className="flex items-baseline gap-1 mb-0.5 sm:mb-1">
-              <span className="text-[9px] sm:text-xs text-slate-400 font-semibold uppercase tracking-wide">{t('assetValue', lang)}</span>
+            <div className="flex items-baseline gap-1 mb-1.5">
+              <span className="text-base font-bold text-slate-900">{formatCurrency(property.assets_value)}</span>
             </div>
-            <div className="flex items-baseline gap-1 mb-1.5 sm:mb-2">
-              <span className="text-sm sm:text-xl font-bold text-slate-900">{formatCurrency(property.assets_value)}</span>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-1.5 bg-emerald-50 rounded-md sm:rounded-lg px-1.5 py-1 sm:px-2.5 sm:py-1.5">
-              <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600" />
-              <span className="text-[9px] sm:text-xs font-bold text-emerald-700">{t('roiPerYear', lang, { roi: roi.toFixed(2) })}</span>
+            <div className="flex items-center gap-1 bg-emerald-50 rounded-lg px-2 py-1">
+              <TrendingUp className="w-3 h-3 text-emerald-600" />
+              <span className="text-xs font-bold text-emerald-700">ROI {roi.toFixed(1)}%</span>
             </div>
           </div>
         )}
